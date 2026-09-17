@@ -189,7 +189,7 @@ return [
     // Pendidikan & sertifikasi = "Guild Hall"
     'education' => [
         [
-            'title' => 'S1 Ilmu Komputer, Teknik Informatika',
+            'title' => 'S1 Komputer, Teknik Informatika',
             'place' => 'STMIK Banjarbaru',
             'period' => 'Sep 2021 — Agu 2025',
             'honors' => ['IPK 3.92 / 4.00', 'Best Graduate', 'Batch Representative', 'Head Of Class'],

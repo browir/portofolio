@@ -4,8 +4,11 @@
         <p class="mt-3 max-w-2xl text-sm text-[#cbb98a]">Pendidikan dan sertifikasi &mdash; scroll yang membuktikan pelatihan formal.</p>
 
         <div class="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
-            <div class="rpg-panel p-8">
-                <h3 class="font-display text-sm uppercase tracking-widest text-[#cbb98a]">Pendidikan</h3>
+            <div class="rpg-panel relative p-8">
+                @include('partials.corners')
+                <h3 class="flex items-center gap-2 font-display text-sm uppercase tracking-widest text-[#cbb98a]">
+                    <x-icon name="cap" class="h-4 w-4 text-[#d9b34a]" /> Pendidikan
+                </h3>
                 <div class="mt-4 space-y-5">
                     @foreach ($data['education'] as $edu)
                         <div class="border-b border-[#d9b34a]/15 pb-4 last:border-0 last:pb-0">
@@ -26,12 +29,17 @@
                 </div>
             </div>
 
-            <div class="rpg-panel p-8">
-                <h3 class="font-display text-sm uppercase tracking-widest text-[#cbb98a]">Scroll Sertifikasi</h3>
-                <div class="mt-4 space-y-4">
+            <div class="rpg-panel relative p-8">
+                @include('partials.corners')
+                <h3 class="flex items-center gap-2 font-display text-sm uppercase tracking-widest text-[#cbb98a]">
+                    <x-icon name="scroll" class="h-4 w-4 text-[#d9b34a]" /> Scroll Sertifikasi
+                </h3>
+                <div class="mt-4 max-h-[26rem] space-y-4 overflow-y-auto pr-1">
                     @foreach ($data['certifications'] as $cert)
                         <div class="flex items-start gap-3 border-b border-[#d9b34a]/15 pb-4 last:border-0 last:pb-0">
-                            <span class="mt-0.5 text-lg">📜</span>
+                            <div class="icon-badge mt-0.5 h-8 w-8 shrink-0 rounded-md">
+                                <x-icon name="scroll" class="h-4 w-4" />
+                            </div>
                             <div>
                                 <p class="font-display text-sm text-[#f4d675]">{{ $cert['name'] }}</p>
                                 <p class="mt-1 text-xs text-[#cbb98a]">{{ $cert['issuer'] }} &middot; {{ $cert['year'] }}</p>

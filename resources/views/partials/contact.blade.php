@@ -1,9 +1,14 @@
 <section id="contact" class="px-6 py-16">
     <div class="mx-auto max-w-3xl">
-        <h2 class="section-heading text-center text-2xl uppercase text-[#f4d675] sm:text-3xl">Send a Raven</h2>
+        <h2 class="section-heading mx-auto text-center text-2xl uppercase text-[#f4d675] sm:text-3xl">
+            <span class="inline-flex items-center gap-3 align-middle">
+                <x-icon name="raven" class="h-7 w-7 text-[#d9b34a]" /> Send a Raven
+            </span>
+        </h2>
         <p class="mt-3 text-center text-sm text-[#cbb98a]">Punya quest baru atau sekadar mau menyapa? Kirim pesan lewat gulungan di bawah.</p>
 
-        <div class="rpg-panel rpg-corners mt-10 p-8">
+        <div class="rpg-panel relative mt-10 p-8">
+            @include('partials.corners')
             @if (session('status'))
                 <div class="mb-6 rounded border border-[#4c9c72]/40 bg-[#2f6b4f]/10 px-4 py-3 text-sm text-[#4c9c72]">
                     {{ session('status') }}

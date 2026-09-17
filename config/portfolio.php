@@ -93,28 +93,28 @@ return [
     'achievements' => [
         [
             'title' => 'SiLapor',
-            'badge' => '🛡️',
+            'badge' => 'shield',
             'description' => 'Aplikasi ticketing IT dan manajemen inventori terintegrasi, dipakai di dua cabang rumah sakit untuk melacak infrastruktur dan mendukung workflow.',
             'stack' => ['Laravel', 'MySQL', 'Tailwind'],
             'link' => '#',
         ],
         [
             'title' => 'DCMS (Document Control Management System)',
-            'badge' => '📜',
+            'badge' => 'scroll',
             'description' => 'Mendigitalkan manajemen rapat dan mensentralisasi workflow dokumen SOP, menstandarkan operasional di dua cabang rumah sakit.',
             'stack' => ['Laravel', 'MySQL'],
             'link' => '#',
         ],
         [
             'title' => 'Chatbot Aurora Executive Clinic',
-            'badge' => '🤖',
+            'badge' => 'gear-bot',
             'description' => 'Sistem chatbot otomatis berbasis n8n untuk mempercepat pendaftaran pasien dan menghasilkan ringkasan data registrasi otomatis.',
             'stack' => ['n8n', 'Automation'],
             'link' => '#',
         ],
         [
             'title' => 'SIMGOS V2',
-            'badge' => '⚔️',
+            'badge' => 'pulse',
             'period' => 'Feb 2026 — Mei 2026',
             'description' => 'Sistem manajemen inti rumah sakit RSU Syifa Medika Banjarbaru, dikembangkan dan terus disempurnakan untuk workflow klinis & administratif.',
             'stack' => ['Web Development', 'Troubleshooting'],
@@ -122,7 +122,7 @@ return [
         ],
         [
             'title' => 'SIMRS Version 2',
-            'badge' => '🏥',
+            'badge' => 'pulse',
             'period' => 'Jan 2026 — Feb 2026',
             'description' => 'Platform sistem informasi manajemen rumah sakit terinspirasi dari SIMRS yang dipakai di Indonesia, dibangun dengan Laravel dan Vue.js.',
             'stack' => ['Laravel', 'Vue.js'],
@@ -130,7 +130,7 @@ return [
         ],
         [
             'title' => 'Financial Analytics & Profit Sharing Dashboard',
-            'badge' => '📊',
+            'badge' => 'chart',
             'period' => 'Des 2025 — Jan 2026',
             'description' => 'Dashboard finansial berbasis web untuk pencatatan pendapatan, distribusi profit, data shareholder, dan peramalan pendapatan bulanan memakai metode regresi linear.',
             'stack' => ['Laravel', 'Machine Learning'],
@@ -138,7 +138,7 @@ return [
         ],
         [
             'title' => 'SIMRS',
-            'badge' => '🩺',
+            'badge' => 'pulse',
             'period' => 'Des 2025',
             'description' => 'Platform manajemen rumah sakit terintegrasi untuk mendigitalkan alur pendaftaran dan informasi layanan, meningkatkan efisiensi operasional.',
             'stack' => ['Laravel', 'Tailwind CSS'],
@@ -146,7 +146,7 @@ return [
         ],
         [
             'title' => 'Decision Support System — Pemilihan Printer',
-            'badge' => '🖨️',
+            'badge' => 'printer',
             'period' => 'Agu 2025 — Nov 2025',
             'description' => 'Menggunakan metode Simple Additive Weighting (SAW) untuk menentukan printer yang paling sesuai kebutuhan toko atau pemilik bisnis.',
             'stack' => ['PHP', 'SAW Method'],
@@ -154,7 +154,7 @@ return [
         ],
         [
             'title' => 'Decision Support System — Pemilihan Kambing Berkualitas',
-            'badge' => '🐐',
+            'badge' => 'paw',
             'period' => 'Sep 2025 — Nov 2025',
             'description' => 'Implementasi metode SMART sebagai panduan memilih kambing berkualitas tinggi, baik untuk penjualan maupun ternak/pembibitan.',
             'stack' => ['PHP', 'SMART Method'],
@@ -162,7 +162,7 @@ return [
         ],
         [
             'title' => 'Decision Support System — Pemilihan Kader Terbaik',
-            'badge' => '🎖️',
+            'badge' => 'medal',
             'period' => 'Agu 2025 — Okt 2025',
             'description' => 'Menggunakan metode Simple Additive Weighting (SAW) untuk menentukan kader terbaik secara objektif.',
             'stack' => ['PHP', 'SAW Method'],
@@ -170,7 +170,7 @@ return [
         ],
         [
             'title' => 'Decision Support System — Pemilihan Ketua Kelas',
-            'badge' => '🗳️',
+            'badge' => 'ballot',
             'period' => 'Sep 2024 — Des 2024',
             'description' => 'Menggunakan metode SAW dan Multi-Attribute Utility Theory (MAUT) untuk menentukan ketua kelas secara objektif di SMPN 1 Martapura.',
             'stack' => ['PHP', 'SAW & MAUT'],
@@ -178,7 +178,7 @@ return [
         ],
         [
             'title' => 'Portofolio Ini',
-            'badge' => '🏰',
+            'badge' => 'castle',
             'period' => null,
             'description' => 'Website portofolio bertema RPG fantasy ini sendiri — dibangun dengan Laravel + Tailwind, di-deploy ke Vercel.',
             'stack' => ['Laravel', 'Tailwind v4', 'Vite'],

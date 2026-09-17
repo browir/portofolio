@@ -7,9 +7,11 @@
             @foreach ($data['achievements'] as $item)
                 <a href="{{ $item['link'] ?? '#' }}"
                    @if(($item['link'] ?? '#') !== '#') target="_blank" rel="noopener" @endif
-                   class="rpg-panel achievement-card block p-6">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-full border border-[#d9b34a]/50 bg-[#d9b34a]/10 text-2xl">
-                        {{ $item['badge'] }}
+                   class="rpg-panel achievement-card relative block p-6 {{ $loop->first ? 'sm:col-span-2 lg:col-span-2' : '' }}">
+                    @include('partials.corners')
+
+                    <div class="icon-badge h-12 w-12 rounded-full">
+                        <x-icon :name="$item['badge']" class="h-6 w-6" />
                     </div>
                     <h3 class="mt-4 font-display text-base text-[#f4d675]">{{ $item['title'] }}</h3>
                     @if(!empty($item['period']))

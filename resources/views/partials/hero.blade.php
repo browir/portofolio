@@ -42,9 +42,10 @@
 
         <!-- Character sheet card -->
         <div class="md:col-span-2">
-            <div class="rpg-panel rpg-corners animate-float-slow relative p-6">
+            <div class="rpg-panel animate-float-slow relative p-6">
+                @include('partials.corners')
                 <div class="flex items-center gap-4">
-                    <div class="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-[#d9b34a] bg-gradient-to-br from-[#2f6b4f] to-[#1b140d] font-display text-3xl text-[#f4d675] shadow-inner">
+                    <div class="avatar-ring flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2f6b4f] to-[#1b140d] font-display text-3xl text-[#f4d675]">
                         {{ $data['hero']['avatar_initial'] }}
                     </div>
                     <div>

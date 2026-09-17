@@ -14,17 +14,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // TEMPORARY diagnostic: bypass Laravel's normal HTML error rendering
-        // and dump the real exception as plain text.
-        $exceptions->render(function (\Throwable $e, $request) {
-            return new \Symfony\Component\HttpFoundation\Response(
-                "EXC2: ".get_class($e)."\nMSG: ".$e->getMessage().
-                "\nAT: ".$e->getFile().':'.$e->getLine().
-                "\n\n".$e->getTraceAsString(),
-                500,
-                ['Content-Type' => 'text/plain']
-            );
-        });
+        //
     })->create();
 
 // Vercel's filesystem is read-only except /tmp. We detect this by attempting
@@ -57,21 +47,28 @@ if (! $canWrite) {
         @mkdir('/tmp/bootstrap-cache', 0775, true);
     }
 
-    // Force stateless-safe config in code (not just .env) so a missing
-    // platform env var can't silently fall back to "database" session/cache
-    // drivers, which would crash since there's no writable DB here.
+    // Force stateless-safe config in code (not just .env). Vercel's "44
+    // detected" env var import from .env.example creates a real (but
+    // EMPTY-STRING) variable for every key the user didn't fill in. Laravel's
+    // env() helper only falls back to a config default when a key is truly
+    // *absent* -- an empty string is a real value, so e.g. APP_MAINTENANCE_DRIVER=""
+    // makes Manager::driver() try to call createDriver() with 0 args and
+    // crash. So we override both "absent" and "empty string".
     foreach ([
         'SESSION_DRIVER' => 'cookie',
         'CACHE_STORE' => 'array',
         'QUEUE_CONNECTION' => 'sync',
         'LOG_CHANNEL' => 'stderr',
+        'APP_MAINTENANCE_DRIVER' => 'file',
+        'BROADCAST_CONNECTION' => 'log',
+        'FILESYSTEM_DISK' => 'local',
         'APP_PACKAGES_CACHE' => '/tmp/bootstrap-cache/packages.php',
         'APP_SERVICES_CACHE' => '/tmp/bootstrap-cache/services.php',
         'APP_CONFIG_CACHE' => '/tmp/bootstrap-cache/config.php',
         'APP_ROUTES_CACHE' => '/tmp/bootstrap-cache/routes.php',
         'APP_EVENTS_CACHE' => '/tmp/bootstrap-cache/events.php',
     ] as $key => $value) {
-        if (getenv($key) === false) {
+        if (in_array(getenv($key), [false, ''], true)) {
             putenv("{$key}={$value}");
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;

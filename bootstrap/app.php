@@ -21,7 +21,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Vercel terminates TLS at its edge and forwards to the PHP runtime
+        // over plain HTTP, so Laravel needs to trust the X-Forwarded-* headers
+        // to know the original request was HTTPS -- otherwise @vite()/asset()
+        // generate http:// URLs, which browsers block as mixed content on an
+        // https:// page (styles/scripts silently fail to load).
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

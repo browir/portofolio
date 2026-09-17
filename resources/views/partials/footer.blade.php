@@ -9,6 +9,9 @@
             @if($data['links']['github'])
                 <a href="{{ $data['links']['github'] }}" target="_blank" rel="noopener" class="nav-link">GitHub</a>
             @endif
+            @if($data['links']['instagram'] ?? null)
+                <a href="{{ $data['links']['instagram'] }}" target="_blank" rel="noopener" class="nav-link">Instagram</a>
+            @endif
             <a href="mailto:{{ $data['links']['email'] }}" class="nav-link">Email</a>
         </div>
 

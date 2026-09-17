@@ -19,7 +19,8 @@ return [
 
     'links' => [
         'linkedin' => 'https://www.linkedin.com/in/wiramarr/',
-        'github' => null,
+        'github' => 'https://github.com/browir',
+        'instagram' => 'https://instagram.com/wiramarr',
         'email' => 'm.wiramar@gmail.com',
         'cv' => null, // isi dengan URL/path CV kalau ada, mis. '/cv/wira-marr-cv.pdf'
     ],

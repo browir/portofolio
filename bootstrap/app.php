@@ -14,7 +14,17 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // TEMPORARY diagnostic: bypass Laravel's normal HTML error rendering
+        // and dump the real exception as plain text.
+        $exceptions->render(function (\Throwable $e, $request) {
+            return new \Symfony\Component\HttpFoundation\Response(
+                "EXC3: ".get_class($e)."\nMSG: ".$e->getMessage().
+                "\nAT: ".$e->getFile().':'.$e->getLine().
+                "\n\n".$e->getTraceAsString(),
+                500,
+                ['Content-Type' => 'text/plain']
+            );
+        });
     })->create();
 
 // Vercel's filesystem is read-only except /tmp. We detect this by attempting

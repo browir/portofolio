@@ -11,7 +11,7 @@
                     <div class="relative flex flex-col md:flex-row md:items-start md:even:flex-row-reverse">
                         <div class="quest-node absolute left-0 top-2.5 h-3 w-3 rotate-45 bg-[#d9b34a] md:left-1/2 md:-translate-x-1/2"></div>
 
-                        <div class="w-full pl-10 md:w-1/2 md:px-10 md:pl-10 md:even:pl-0 md:even:pr-10">
+                        <div class="w-full pl-10 md:w-1/2 md:px-10">
                             <div class="rpg-panel achievement-card relative p-6">
                                 @include('partials.corners')
                                 <div class="mb-2 flex flex-wrap items-center gap-3">

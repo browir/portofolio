@@ -4,6 +4,16 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+// Defensive: strip stray whitespace (tabs/newlines from copy-pasting into a
+// dashboard UI) around APP_KEY, since even one leading character breaks
+// Encrypter's cipher key validation with an opaque error.
+if (($key = getenv('APP_KEY')) !== false && $key !== trim($key)) {
+    $trimmed = trim($key);
+    putenv("APP_KEY={$trimmed}");
+    $_ENV['APP_KEY'] = $trimmed;
+    $_SERVER['APP_KEY'] = $trimmed;
+}
+
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -14,17 +24,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // TEMPORARY diagnostic: bypass Laravel's normal HTML error rendering
-        // and dump the real exception as plain text.
-        $exceptions->render(function (\Throwable $e, $request) {
-            return new \Symfony\Component\HttpFoundation\Response(
-                "EXC3: ".get_class($e)."\nMSG: ".$e->getMessage().
-                "\nAT: ".$e->getFile().':'.$e->getLine().
-                "\n\n".$e->getTraceAsString(),
-                500,
-                ['Content-Type' => 'text/plain']
-            );
-        });
+        //
     })->create();
 
 // Vercel's filesystem is read-only except /tmp. We detect this by attempting

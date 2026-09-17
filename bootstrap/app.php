@@ -14,17 +14,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        // TEMPORARY diagnostic: bypass Laravel's normal HTML error rendering
-        // and dump the real exception as plain text.
-        $exceptions->render(function (\Throwable $e, $request) {
-            return new \Symfony\Component\HttpFoundation\Response(
-                "EXC: ".get_class($e)."\nMSG: ".$e->getMessage().
-                "\nAT: ".$e->getFile().':'.$e->getLine().
-                "\n\n".$e->getTraceAsString(),
-                500,
-                ['Content-Type' => 'text/plain']
-            );
-        });
+        //
     })->create();
 
 // Vercel's filesystem is read-only except /tmp. We detect this by attempting
@@ -48,6 +38,15 @@ if (! $canWrite) {
         }
     }
 
+    // bootstrap/cache is a *separate* directory from storage/ and is just as
+    // read-only. Laravel writes its package/service/config/route manifests
+    // there lazily on first boot if no cache exists yet -- which crashes
+    // hard (uncaught Exception, not a Laravel-rendered error) on Vercel.
+    // These APP_*_CACHE env vars are Laravel's built-in override for this.
+    if (! is_dir('/tmp/bootstrap-cache')) {
+        @mkdir('/tmp/bootstrap-cache', 0775, true);
+    }
+
     // Force stateless-safe config in code (not just .env) so a missing
     // platform env var can't silently fall back to "database" session/cache
     // drivers, which would crash since there's no writable DB here.
@@ -56,6 +55,11 @@ if (! $canWrite) {
         'CACHE_STORE' => 'array',
         'QUEUE_CONNECTION' => 'sync',
         'LOG_CHANNEL' => 'stderr',
+        'APP_PACKAGES_CACHE' => '/tmp/bootstrap-cache/packages.php',
+        'APP_SERVICES_CACHE' => '/tmp/bootstrap-cache/services.php',
+        'APP_CONFIG_CACHE' => '/tmp/bootstrap-cache/config.php',
+        'APP_ROUTES_CACHE' => '/tmp/bootstrap-cache/routes.php',
+        'APP_EVENTS_CACHE' => '/tmp/bootstrap-cache/events.php',
     ] as $key => $value) {
         if (getenv($key) === false) {
             putenv("{$key}={$value}");

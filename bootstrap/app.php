@@ -14,7 +14,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // TEMPORARY diagnostic: bypass Laravel's normal HTML error rendering
+        // (which itself is crashing) and dump the real exception as plain
+        // text using Symfony's Response directly, no container resolution.
+        $exceptions->render(function (\Throwable $e, $request) {
+            return new \Symfony\Component\HttpFoundation\Response(
+                "EXC: ".get_class($e)."\nMSG: ".$e->getMessage().
+                "\nAT: ".$e->getFile().':'.$e->getLine().
+                "\n\n".$e->getTraceAsString(),
+                500,
+                ['Content-Type' => 'text/plain']
+            );
+        });
     })->create();
 
 // Vercel's filesystem is read-only except /tmp. We detect this by attempting

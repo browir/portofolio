@@ -12,6 +12,9 @@
                         {{ $item['badge'] }}
                     </div>
                     <h3 class="mt-4 font-display text-base text-[#f4d675]">{{ $item['title'] }}</h3>
+                    @if(!empty($item['period']))
+                        <p class="mt-0.5 text-[11px] uppercase tracking-widest text-[#cbb98a]">{{ $item['period'] }}</p>
+                    @endif
                     <p class="mt-2 text-sm leading-relaxed text-[#ecdcb4]/85">{{ $item['description'] }}</p>
 
                     <div class="mt-4 flex flex-wrap gap-1.5">

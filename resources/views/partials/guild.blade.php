@@ -12,6 +12,15 @@
                             <p class="font-display text-base text-[#f4d675]">{{ $edu['title'] }}</p>
                             <p class="mt-1 text-sm text-[#ecdcb4]/85">{{ $edu['place'] }}</p>
                             <p class="mt-1 text-xs uppercase tracking-widest text-[#cbb98a]">{{ $edu['period'] }}</p>
+                            @if(!empty($edu['honors']))
+                                <div class="mt-3 flex flex-wrap gap-1.5">
+                                    @foreach ($edu['honors'] as $honor)
+                                        <span class="rounded border border-[#2f6b4f]/50 bg-[#2f6b4f]/10 px-2 py-1 text-[11px] text-[#4c9c72]">
+                                            {{ $honor }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>

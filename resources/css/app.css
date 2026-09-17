@@ -1,0 +1,222 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-display: 'Cinzel', ui-serif, Georgia, serif;
+    --font-body: 'Spectral', ui-serif, Georgia, serif;
+
+    --color-ink: #0d0a08;
+    --color-parchment: #ecdcb4;
+    --color-parchment-dim: #cbb98a;
+    --color-panel: #1b140dcc;
+    --color-panel-solid: #1b140d;
+    --color-gold: #d9b34a;
+    --color-gold-bright: #f4d675;
+    --color-crimson: #9c2b3c;
+    --color-crimson-bright: #d1495b;
+    --color-emerald: #2f6b4f;
+    --color-emerald-bright: #4c9c72;
+    --color-arcane: #5b6fd6;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-ink);
+    color: var(--color-parchment);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(217, 179, 74, 0.12), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 20%, rgba(92, 43, 43, 0.18), transparent 60%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 3px);
+}
+
+.font-display {
+    font-family: var(--font-display);
+}
+
+/* Ornate panel used across sections: parchment-on-dark card with gold border */
+.rpg-panel {
+    position: relative;
+    background: linear-gradient(180deg, rgba(28, 20, 13, 0.92), rgba(13, 10, 8, 0.95));
+    border: 1px solid rgba(217, 179, 74, 0.35);
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.6),
+        0 20px 50px -20px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    border-radius: 0.5rem;
+}
+
+.rpg-panel::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(217, 179, 74, 0.18);
+    border-radius: 0.35rem;
+    pointer-events: none;
+}
+
+/* Corner ornaments */
+.rpg-corners::after,
+.rpg-corners::before {
+    content: '◆';
+    position: absolute;
+    color: var(--color-gold);
+    font-size: 0.7rem;
+    opacity: 0.8;
+    top: 6px;
+    left: 6px;
+}
+
+.rpg-corners::after {
+    left: auto;
+    right: 6px;
+}
+
+.section-heading {
+    font-family: var(--font-display);
+    letter-spacing: 0.08em;
+}
+
+.section-heading::after {
+    content: '';
+    display: block;
+    width: 5rem;
+    height: 2px;
+    margin-top: 0.75rem;
+    background: linear-gradient(90deg, var(--color-gold), transparent);
+}
+
+/* HUD-style stat bar */
+.stat-track {
+    position: relative;
+    height: 0.85rem;
+    border-radius: 9999px;
+    background: #100c08;
+    border: 1px solid rgba(217, 179, 74, 0.4);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.stat-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, var(--color-emerald), var(--color-gold-bright));
+    box-shadow: 0 0 8px rgba(217, 179, 74, 0.55);
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Difficulty / rarity badges */
+.badge-rank {
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+    border: 1px solid rgba(217, 179, 74, 0.5);
+    background: rgba(217, 179, 74, 0.08);
+    color: var(--color-gold-bright);
+}
+
+.nav-link {
+    position: relative;
+    color: var(--color-parchment-dim);
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--color-gold-bright);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 1px;
+    background: var(--color-gold);
+    transition: width 0.25s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.btn-quest {
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.btn-quest:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, var(--color-gold-bright), var(--color-gold));
+    color: #1b140d;
+    box-shadow: 0 6px 20px -6px rgba(217, 179, 74, 0.6);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 10px 28px -6px rgba(217, 179, 74, 0.8);
+}
+
+.btn-ghost {
+    border: 1px solid rgba(217, 179, 74, 0.45);
+    color: var(--color-parchment);
+}
+
+.btn-ghost:hover {
+    background: rgba(217, 179, 74, 0.08);
+}
+
+/* Achievement card hover glow */
+.achievement-card {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(217, 179, 74, 0.6);
+    box-shadow: 0 20px 40px -20px rgba(217, 179, 74, 0.35);
+}
+
+/* Quest log timeline */
+.quest-line {
+    background: linear-gradient(180deg, var(--color-gold), transparent);
+}
+
+.quest-node {
+    box-shadow: 0 0 0 4px rgba(13, 10, 8, 1), 0 0 12px rgba(217, 179, 74, 0.7);
+}
+
+/* Scroll progress bar (top of page) styled like a boss/quest bar */
+#scroll-progress {
+    background: linear-gradient(90deg, var(--color-crimson), var(--color-gold-bright));
+    box-shadow: 0 0 10px rgba(217, 179, 74, 0.6);
+}
+
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+.animate-float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    45% { opacity: 0.85; }
+    50% { opacity: 1; }
+    55% { opacity: 0.9; }
+}
+
+.animate-flicker {
+    animation: flicker 4s ease-in-out infinite;
+}

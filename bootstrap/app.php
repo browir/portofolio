@@ -17,11 +17,18 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-// Vercel's filesystem is read-only except /tmp. We detect this directly by
-// checking writability instead of trusting a custom env var to be present
+// Vercel's filesystem is read-only except /tmp. We detect this by attempting
+// a real write instead of trusting is_writable() (permission bits can say
+// "writable" even on a read-only Lambda-style mount) or a custom env var
 // (vercel.json's top-level "env" block isn't reliably applied to community
 // runtimes, and dashboard-configured vars can silently miss one or two).
-if (! is_writable(dirname(__DIR__).'/storage/framework')) {
+$probeFile = dirname(__DIR__).'/storage/framework/.write_probe';
+$canWrite = @file_put_contents($probeFile, '1') !== false;
+if ($canWrite) {
+    @unlink($probeFile);
+}
+
+if (! $canWrite) {
     $app->useStoragePath('/tmp/storage');
 
     foreach (['framework/cache/data', 'framework/sessions', 'framework/views', 'framework/testing', 'logs', 'app/public'] as $dir) {

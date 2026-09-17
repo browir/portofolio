@@ -7,17 +7,13 @@
         '#guild' => 'Guild Hall',
         '#contact' => 'Contact',
     ];
-    $nameParts = explode(' ', $data['hero']['name']);
-    $navName = count($nameParts) > 2
-        ? $nameParts[0].' '.end($nameParts)
-        : $data['hero']['name'];
 @endphp
 
 <header class="sticky top-0 z-50 border-b border-[#d9b34a]/20 bg-[#0d0a08]/85 backdrop-blur-md">
     <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a href="#top" class="flex items-center gap-2 font-display text-lg tracking-widest text-[#f4d675]">
             <x-icon name="gem" class="h-5 w-5 text-[#d9b34a]" />
-            {{ strtoupper($navName) }}
+            {{ strtoupper($data['hero']['name']) }}
         </a>
 
         <nav class="hidden items-center gap-8 text-sm md:flex">

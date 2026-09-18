@@ -82,6 +82,13 @@ if (! $canWrite) {
         'APP_CONFIG_CACHE' => '/tmp/bootstrap-cache/config.php',
         'APP_ROUTES_CACHE' => '/tmp/bootstrap-cache/routes.php',
         'APP_EVENTS_CACHE' => '/tmp/bootstrap-cache/events.php',
+        // An empty SESSION_LIFETIME casts to (int) 0 in config/session.php,
+        // which makes StartSession compute the cookie's expiry as
+        // "now + 0 seconds" -- i.e. Max-Age=0, so the browser discards the
+        // session cookie instantly and every request starts a fresh
+        // session. That breaks CSRF validation on every form submit.
+        'SESSION_LIFETIME' => '120',
+        'APP_NAME' => 'Wira Marr Portfolio',
     ] as $key => $value) {
         if (in_array(getenv($key), [false, ''], true)) {
             putenv("{$key}={$value}");

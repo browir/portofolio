@@ -32,15 +32,20 @@ import './bootstrap';
     }
 
     function dismiss() {
+        // Reveal character-select *before* the gate starts fading, so it's
+        // already sitting behind the gate (z-index just below it) the
+        // instant the fade begins -- otherwise the dashboard peeks through
+        // for a frame or two while the gate is transparent but
+        // character-select hasn't appeared yet.
+        const select = document.getElementById('character-select');
+        if (select) select.hidden = false;
+
         gate.classList.add('is-dismissed');
         // Body scroll stays locked -- the character-select screen picks up
         // right after this and unlocks it once a character is chosen.
         window.setTimeout(() => {
             gate.remove();
-            const select = document.getElementById('character-select');
-            if (select) {
-                select.hidden = false;
-            } else {
+            if (!select) {
                 document.body.style.overflow = '';
                 window.dispatchEvent(new CustomEvent('game:start'));
             }

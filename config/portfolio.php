@@ -11,7 +11,7 @@ return [
         'title' => 'Player One',
         'level' => 23,
         'company' => 'PT. Syifa Global Group',
-        'tagline' => 'Merancang sistem informasi rumah sakit, otomasi, dan solusi berbasis AI — dari ide sampai production, dengan fokus pada efisiensi dan keandalan.',
+        'tagline' => 'Merancang sistem informasi untuk keperluan rumah sakit, otomasi, dan solusi berbasis AI — dari ide sampai production, dengan fokus pada efisiensi dan keandalan.',
         'avatar_initial' => 'W',
         'location' => 'Banjarbaru, Kalimantan Selatan, Indonesia',
         'status' => 'Terbuka untuk kolaborasi & peluang baru',

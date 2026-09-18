@@ -389,6 +389,16 @@ body > * {
     color: var(--color-parchment-dim);
 }
 
+.start-gate-mission {
+    margin-top: 1rem;
+    max-width: 28rem;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.15rem;
+    line-height: 1.4;
+    color: var(--color-parchment);
+}
+
 .start-btn {
     display: inline-block;
     margin-top: 2.5rem;

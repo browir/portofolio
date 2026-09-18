@@ -17,11 +17,11 @@ import './bootstrap';
     let misses = 0;
 
     const hints = [
-        'Klik tombol START untuk masuk',
-        'Ups, itu bukan tombolnya!',
-        'START-nya makin gede nih...',
-        'Coba klik yang kuning itu!',
-        'Udah gede banget, masa masih meleset?',
+        'Tekan START untuk memulai petualangan',
+        'Eh, bukan di situ, Player!',
+        'START-nya makin gede biar nggak meleset lagi...',
+        'Ayo, klik yang kuning menyala itu!',
+        'Udah segede ini masih meleset? Semangat, dikit lagi!',
     ];
 
     function grow() {

@@ -1,40 +1,88 @@
 @props(['name', 'class' => 'h-10 w-10'])
 
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="{{ $class }}">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{ match(true) { $name === 'dragon' => '40', default => '50' } }} 32" class="{{ $class }} character-sprite">
     @switch($name)
         @case('knight')
-            <circle cx="16" cy="17" r="13" fill="#9aa7ba" />
-            <path d="M16 2 19 9h-6Z" fill="#ff4d6d" />
-            <rect x="7" y="15" width="18" height="6" fill="#1d2b53" />
-            <rect x="10" y="16.4" width="3.2" height="3.2" fill="#7ef9ff" />
-            <rect x="18.8" y="16.4" width="3.2" height="3.2" fill="#7ef9ff" />
-            <rect x="11" y="25" width="10" height="3" fill="#ffec27" />
+            {{-- shield --}}
+            <ellipse cx="6" cy="10" rx="4.2" ry="5.8" fill="#1d2b53" stroke="#ffd60a" stroke-width="1" />
+            <path d="M6 5v10M1.5 10h9" stroke="#ffd60a" stroke-width="1" />
+            {{-- horse mount: legs grouped in two diagonal pairs so they can
+                 animate as an alternating trot cycle --}}
+            <g class="mount-leg mount-leg-a">
+                <rect x="11" y="25" width="2.4" height="6" fill="#6b4a2b" />
+                <rect x="26" y="25" width="2.4" height="6" fill="#6b4a2b" />
+            </g>
+            <g class="mount-leg mount-leg-b">
+                <rect x="16" y="25" width="2.4" height="6" fill="#6b4a2b" />
+                <rect x="31" y="25" width="2.4" height="6" fill="#6b4a2b" />
+            </g>
+            <ellipse cx="22" cy="22.5" rx="13.5" ry="6" fill="#a9713f" />
+            <path d="M9 19q-5 3-3 10" stroke="#6b4a2b" stroke-width="2.4" fill="none" stroke-linecap="round" />
+            <path d="M31 22 33 11q.4-2 1.8-1l4 2.3q1 .6 0 1.2l-2.6 1.5 1.8 1q1 .6-.1 1.1l-3.2 1.4-1.2 4Z" fill="#a9713f" />
+            <path d="M34.3 10.3 36 6.8 37 10.8Z" fill="#6b4a2b" />
+            {{-- knight head --}}
+            <circle cx="19" cy="12" r="8.5" fill="#9aa7ba" />
+            <path d="M19 2 21 7h-4Z" fill="#ff4d6d" />
+            <rect x="13.5" y="10.3" width="11" height="4" fill="#1d2b53" />
+            <rect x="15.5" y="11.2" width="2.1" height="2.1" fill="#7ef9ff" />
+            <rect x="21" y="11.2" width="2.1" height="2.1" fill="#7ef9ff" />
+            <rect x="14.5" y="17" width="9" height="2" fill="#ffec27" />
+            {{-- sword, held up beside the knight's own shoulder --}}
+            <path d="M25 18 31 4 32.3 4.6 26.3 18.6Z" fill="#c9d3e0" />
+            <path d="M23.5 17 27.5 15 28.5 17 24.5 19Z" fill="#8a5a2b" />
             @break
 
         @case('princess')
-            <circle cx="16" cy="17" r="12" fill="#ffd9b3" />
-            <circle cx="6" cy="16" r="4" fill="#8a5a2b" />
-            <circle cx="26" cy="16" r="4" fill="#8a5a2b" />
-            <ellipse cx="9.3" cy="20.6" rx="1.7" ry="1.1" fill="#ff9fc0" opacity="0.85" />
-            <ellipse cx="22.7" cy="20.6" rx="1.7" ry="1.1" fill="#ff9fc0" opacity="0.85" />
-            <circle cx="12" cy="17.4" r="1.6" fill="#1d2b53" />
-            <circle cx="20" cy="17.4" r="1.6" fill="#1d2b53" />
-            <path d="M9.6 15 8.3 13.6M22.4 15 23.7 13.6" stroke="#1d2b53" stroke-width="1" fill="none" stroke-linecap="round" />
-            <path d="M12 23q4 3 8 0" stroke="#1d2b53" stroke-width="1.4" fill="none" stroke-linecap="round" />
-            <path d="M8 25q8 4 16 0v3q-8 3-16 0Z" fill="#ff4d8d" />
-            <path d="M9 9 9 4 12.5 7 16 2 19.5 7 23 4 23 9Z" fill="#ffd60a" />
-            <circle cx="16" cy="5.5" r="1" fill="#ff77a8" />
+            {{-- guard escort --}}
+            <rect x="8" y="2" width="1.4" height="17" fill="#8a5a2b" />
+            <path d="M7.2 2 8.7 0 10.2 2Z" fill="#c9d3e0" />
+            <rect x="2.5" y="9" width="6" height="3" fill="#1d2b53" />
+            <circle cx="5.5" cy="7" r="3.4" fill="#9aa7ba" />
+            <rect x="3.3" y="12" width="4.4" height="6.5" fill="#5b6a86" />
+            <rect x="2.7" y="18.5" width="2.2" height="5" fill="#3d4a5e" />
+            <rect x="6.1" y="18.5" width="2.2" height="5" fill="#3d4a5e" />
+            {{-- carriage: wheels grouped with a spoke so rotation reads
+                 clearly rather than a plain circle spinning in place --}}
+            <g class="carriage-wheel">
+                <circle cx="16" cy="27" r="4" fill="#3a2a1a" />
+                <circle cx="16" cy="27" r="1.6" fill="#c9a86a" />
+                <path d="M16 23.5v7M12.5 27h7" stroke="#c9a86a" stroke-width="0.8" />
+            </g>
+            <g class="carriage-wheel">
+                <circle cx="32" cy="27" r="4" fill="#3a2a1a" />
+                <circle cx="32" cy="27" r="1.6" fill="#c9a86a" />
+                <path d="M32 23.5v7M28.5 27h7" stroke="#c9a86a" stroke-width="0.8" />
+            </g>
+            <path d="M9 14h30l-3 12H12Z" fill="#ff77a8" />
+            <path d="M9 14h30v3H9Z" fill="#ffd60a" />
+            <circle cx="24" cy="20.5" r="3" fill="#ff4d8d" />
+            {{-- princess head --}}
+            <circle cx="24" cy="10" r="7.2" fill="#ffd9b3" />
+            <circle cx="18" cy="9.4" r="2.4" fill="#8a5a2b" />
+            <circle cx="30" cy="9.4" r="2.4" fill="#8a5a2b" />
+            <ellipse cx="20" cy="12.2" rx="1" ry="0.66" fill="#ff9fc0" opacity="0.85" />
+            <ellipse cx="28" cy="12.2" rx="1" ry="0.66" fill="#ff9fc0" opacity="0.85" />
+            <circle cx="21.6" cy="10.2" r="0.96" fill="#1d2b53" />
+            <circle cx="26.4" cy="10.2" r="0.96" fill="#1d2b53" />
+            <path d="M19.8 8.8 18.8 7.9M28.2 8.8 29.2 7.9" stroke="#1d2b53" stroke-width="0.6" fill="none" stroke-linecap="round" />
+            <path d="M21.6 14q2.4 1.8 4.8 0" stroke="#1d2b53" stroke-width="0.9" fill="none" stroke-linecap="round" />
+            {{-- crown drawn last so it isn't hidden under the head circle --}}
+            <path d="M20.4 4.6 20.4 2 22.5 3.8 24 1 25.5 3.8 27.6 2 27.6 4.6Z" fill="#ffd60a" />
+            <circle cx="24" cy="2.8" r="0.7" fill="#ff77a8" />
             @break
 
         @case('dragon')
-            <circle cx="16" cy="18" r="12" fill="#ff004d" />
-            <path d="M7 9 12 1 13 10Z" fill="#7a0026" />
-            <path d="M25 9 20 1 19 10Z" fill="#7a0026" />
-            <path d="M8 24q8 5 16 0v3q-8 4-16 0Z" fill="#c40041" />
-            <path d="M11 16 14.5 18 11 20.4Z" fill="#ffec27" />
-            <path d="M21 16 17.5 18 21 20.4Z" fill="#ffec27" />
-            <circle cx="13" cy="24" r="0.9" fill="#5c0018" />
-            <circle cx="19" cy="24" r="0.9" fill="#5c0018" />
+            {{-- wings drawn first so the head naturally hides their roots --}}
+            <path class="character-wing" d="M26 15 37 6 32 17 38 18 28 23Z" fill="#c40041" />
+            <path class="character-wing" d="M14 15 3 6 8 17 2 18 12 23Z" fill="#c40041" />
+            <circle cx="20" cy="18" r="11" fill="#ff004d" />
+            <path d="M11 9 16 1 17 10Z" fill="#7a0026" />
+            <path d="M29 9 24 1 23 10Z" fill="#7a0026" />
+            <path d="M12 24q8 5 16 0v3q-8 4-16 0Z" fill="#c40041" />
+            <path d="M15 16 18.5 18 15 20.4Z" fill="#ffec27" />
+            <path d="M25 16 21.5 18 25 20.4Z" fill="#ffec27" />
+            <circle cx="17" cy="24" r="0.9" fill="#5c0018" />
+            <circle cx="23" cy="24" r="0.9" fill="#5c0018" />
             @break
 
         @default

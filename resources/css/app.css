@@ -720,6 +720,35 @@ body > * {
     box-shadow: 0 0 0 3px var(--color-gold-bright), 9px 9px 0 0 rgba(0, 0, 0, 0.75);
 }
 
+/* Each character gets its own border/glow color so the three cards read as
+   distinct picks at a glance, not just interchangeable boxes. */
+.character-card[data-character="knight"] {
+    background: linear-gradient(180deg, rgba(154, 167, 186, 0.14), var(--color-panel-solid) 65%);
+    box-shadow: 0 0 0 3px #9aa7ba, 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card[data-character="knight"]:hover {
+    box-shadow: 0 0 0 3px #c3ccd9, 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card[data-character="princess"] {
+    background: linear-gradient(180deg, rgba(255, 119, 168, 0.14), var(--color-panel-solid) 65%);
+    box-shadow: 0 0 0 3px var(--color-crimson-bright), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card[data-character="princess"]:hover {
+    box-shadow: 0 0 0 3px #ffa8c8, 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card[data-character="dragon"] {
+    background: linear-gradient(180deg, rgba(255, 0, 77, 0.14), var(--color-panel-solid) 65%);
+    box-shadow: 0 0 0 3px var(--color-crimson), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card[data-character="dragon"]:hover {
+    box-shadow: 0 0 0 3px var(--color-crimson-bright), 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
 .character-card.is-picked {
     box-shadow: 0 0 0 3px var(--color-emerald-bright), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
 }
@@ -890,4 +919,50 @@ body > * {
 
 .comment-item-new {
     animation: comment-pop 0.25s steps(4);
+}
+
+/* Dragon companion wings: flap continuously so the sprite reads as alive,
+   not just a static badge, everywhere it appears (select screen + HUD pet). */
+.character-wing {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wing-flap 0.7s ease-in-out infinite;
+}
+
+@keyframes wing-flap {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.5); }
+}
+
+/* Knight's horse: legs trot in two alternating diagonal pairs. */
+.mount-leg {
+    transform-box: fill-box;
+    transform-origin: top;
+    animation: mount-trot-a 0.5s ease-in-out infinite;
+}
+
+.mount-leg-b {
+    animation-name: mount-trot-b;
+}
+
+@keyframes mount-trot-a {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-1.4px) rotate(8deg); }
+}
+
+@keyframes mount-trot-b {
+    0%, 100% { transform: translateY(-1.4px) rotate(-8deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+}
+
+/* Princess's carriage wheels: spin continuously, spokes make the rotation
+   actually readable instead of a plain circle sitting still. */
+.carriage-wheel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: wheel-spin 1s linear infinite;
+}
+
+@keyframes wheel-spin {
+    to { transform: rotate(360deg); }
 }

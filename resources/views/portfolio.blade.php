@@ -8,4 +8,5 @@
     @include('partials.achievements')
     @include('partials.guild')
     @include('partials.contact')
+    @include('partials.comments')
 @endsection

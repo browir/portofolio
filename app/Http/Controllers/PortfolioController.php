@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -13,6 +14,7 @@ class PortfolioController extends Controller
     {
         return view('portfolio', [
             'data' => config('portfolio'),
+            'comments' => Comment::latest()->limit(50)->get(),
         ]);
     }
 
@@ -37,6 +39,6 @@ class PortfolioController extends Controller
             );
         }
 
-        return back()->with('status', 'Pesanmu terkirim lewat burung gagak! Aku akan membalas secepatnya.');
+        return back()->with('status', 'Pesanmu berhasil terkirim! Aku akan membalas secepatnya.');
     }
 }

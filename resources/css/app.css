@@ -6,21 +6,21 @@
 @source '../**/*.js';
 
 @theme {
-    --font-display: 'Cinzel', ui-serif, Georgia, serif;
-    --font-body: 'Spectral', ui-serif, Georgia, serif;
+    --font-display: 'Press Start 2P', ui-monospace, 'Courier New', monospace;
+    --font-body: 'VT323', ui-monospace, 'Courier New', monospace;
 
-    --color-ink: #0d0a08;
-    --color-parchment: #ecdcb4;
-    --color-parchment-dim: #cbb98a;
-    --color-panel: #1b140dcc;
-    --color-panel-solid: #1b140d;
-    --color-gold: #d9b34a;
-    --color-gold-bright: #f4d675;
-    --color-crimson: #9c2b3c;
-    --color-crimson-bright: #d1495b;
-    --color-emerald: #2f6b4f;
-    --color-emerald-bright: #4c9c72;
-    --color-arcane: #5b6fd6;
+    --color-ink: #0b0b14;
+    --color-parchment: #fff1e8;
+    --color-parchment-dim: #83769c;
+    --color-panel: #1d2b53cc;
+    --color-panel-solid: #1d2b53;
+    --color-gold: #ffec27;
+    --color-gold-bright: #fff7a0;
+    --color-crimson: #ff004d;
+    --color-crimson-bright: #ff77a8;
+    --color-emerald: #00e436;
+    --color-emerald-bright: #5cffab;
+    --color-arcane: #29adff;
 }
 
 html {
@@ -29,25 +29,33 @@ html {
 
 body {
     font-family: var(--font-body);
+    font-size: 1.15rem;
+    line-height: 1.55;
     background-color: var(--color-ink);
     color: var(--color-parchment);
     background-image:
-        radial-gradient(ellipse 70% 45% at 18% -8%, rgba(217, 179, 74, 0.1), transparent 60%),
-        radial-gradient(ellipse 55% 40% at 96% 18%, rgba(92, 43, 43, 0.16), transparent 60%),
-        radial-gradient(ellipse 60% 50% at 50% 110%, rgba(47, 107, 79, 0.1), transparent 60%);
+        radial-gradient(ellipse 70% 45% at 18% -8%, rgba(255, 236, 39, 0.1), transparent 60%),
+        radial-gradient(ellipse 55% 40% at 96% 18%, rgba(255, 0, 77, 0.14), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 50% 110%, rgba(0, 228, 54, 0.1), transparent 60%);
 }
 
-/* Fixed grain layer: breaks up flat gradients so panels read as tactile
-   parchment/leather rather than smooth digital blur. */
+/* CRT scanline layer: replaces the old parchment grain so panels read as a
+   glowing arcade screen rather than smooth digital blur. */
 body::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.35;
     mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.65) 0px,
+        rgba(0, 0, 0, 0.65) 1px,
+        transparent 1px,
+        transparent 3px
+    );
 }
 
 body > * {
@@ -59,30 +67,30 @@ body > * {
     font-family: var(--font-display);
 }
 
-/* Ornate panel used across sections: parchment-on-dark card with gold border */
+/* Pixel window: flat panel with a hard black border, a gold outline ring and
+   a stepped drop-shadow instead of a soft blur -- reads like an 8-bit dialog
+   box rather than a glassy card. */
 .rpg-panel {
     position: relative;
-    background: linear-gradient(180deg, rgba(28, 20, 13, 0.92), rgba(13, 10, 8, 0.95));
-    border: 1px solid rgba(217, 179, 74, 0.35);
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
     box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.6),
-        0 20px 50px -20px rgba(0, 0, 0, 0.8),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    border-radius: 0.5rem;
+        0 0 0 3px var(--color-gold),
+        7px 7px 0 0 rgba(0, 0, 0, 0.75);
+    border-radius: 0;
 }
 
 .rpg-panel::before {
     content: '';
     position: absolute;
-    inset: 7px;
-    border: 1px solid rgba(217, 179, 74, 0.14);
-    border-radius: 0.35rem;
+    inset: 8px;
+    border: 1px dashed rgba(255, 236, 39, 0.25);
     pointer-events: none;
 }
 
 /* Inventory-slot style corner brackets, drawn from real borders rather than
-   a unicode glyph -- reads as an intentional UI frame, not a decoration
-   sprinkled on top. */
+   a unicode glyph -- sharp right angles, no rounding, like a menu cursor
+   frame. */
 .frame-corner {
     position: absolute;
     width: 1.05rem;
@@ -94,52 +102,53 @@ body > * {
     content: '';
     position: absolute;
     inset: 0;
-    border-color: var(--color-gold);
+    border-color: var(--color-gold-bright);
     opacity: 0.9;
 }
 
-.frame-corner-tl { top: -1px; left: -1px; }
-.frame-corner-tl::before { border-top: 2px solid; border-left: 2px solid; border-top-left-radius: 4px; }
+.frame-corner-tl { top: -4px; left: -4px; }
+.frame-corner-tl::before { border-top: 3px solid; border-left: 3px solid; }
 
-.frame-corner-tr { top: -1px; right: -1px; }
-.frame-corner-tr::before { border-top: 2px solid; border-right: 2px solid; border-top-right-radius: 4px; }
+.frame-corner-tr { top: -4px; right: -4px; }
+.frame-corner-tr::before { border-top: 3px solid; border-right: 3px solid; }
 
-.frame-corner-bl { bottom: -1px; left: -1px; }
-.frame-corner-bl::before { border-bottom: 2px solid; border-left: 2px solid; border-bottom-left-radius: 4px; }
+.frame-corner-bl { bottom: -4px; left: -4px; }
+.frame-corner-bl::before { border-bottom: 3px solid; border-left: 3px solid; }
 
-.frame-corner-br { bottom: -1px; right: -1px; }
-.frame-corner-br::before { border-bottom: 2px solid; border-right: 2px solid; border-bottom-right-radius: 4px; }
+.frame-corner-br { bottom: -4px; right: -4px; }
+.frame-corner-br::before { border-bottom: 3px solid; border-right: 3px solid; }
 
 .section-heading {
     font-family: var(--font-display);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.04em;
+    line-height: 1.6;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
 }
 
 .section-heading::after {
     content: '';
     display: block;
-    width: 5rem;
-    height: 2px;
-    margin-top: 0.75rem;
-    background: linear-gradient(90deg, var(--color-gold), transparent);
+    width: 6.5rem;
+    height: 4px;
+    margin-top: 1rem;
+    background-image: repeating-linear-gradient(90deg, var(--color-gold) 0 6px, transparent 6px 10px);
 }
 
 .section-heading.text-center::after {
     margin-left: auto;
     margin-right: auto;
-    background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
 }
 
-/* HUD-style stat bar, drawn like a gauge with tick divisions rather than a
-   flat progress pill. */
+/* HUD-style stat bar: segmented like a Game Boy energy meter, fills in
+   discrete pixel steps rather than a smooth glide. */
 .stat-track {
     position: relative;
-    height: 0.85rem;
-    border-radius: 3px;
-    background: #100c08;
-    border: 1px solid rgba(217, 179, 74, 0.4);
+    height: 1rem;
+    border-radius: 0;
+    background: var(--color-ink);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold), inset 0 0 0 2px rgba(0, 0, 0, 0.5);
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 .stat-track::after {
@@ -149,32 +158,36 @@ body > * {
     background-image: repeating-linear-gradient(
         90deg,
         transparent 0,
-        transparent calc(10% - 1px),
-        rgba(13, 10, 8, 0.55) 10%
+        transparent calc(8% - 2px),
+        var(--color-ink) 8%
     );
     pointer-events: none;
 }
 
 .stat-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--color-emerald), var(--color-gold-bright));
-    box-shadow: 0 0 8px rgba(217, 179, 74, 0.55);
-    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: var(--color-emerald);
+    box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+    transition: width 1s steps(20);
 }
 
 /* Difficulty / rarity badges */
 .badge-rank {
     font-family: var(--font-display);
-    letter-spacing: 0.05em;
-    border: 1px solid rgba(217, 179, 74, 0.5);
-    background: rgba(217, 179, 74, 0.08);
+    letter-spacing: 0.02em;
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold);
+    background: var(--color-panel-solid);
     color: var(--color-gold-bright);
+    border-radius: 0;
 }
 
 .nav-link {
     position: relative;
     color: var(--color-parchment-dim);
-    transition: color 0.2s ease;
+    transition: color 0.15s steps(2);
 }
 
 .nav-link:hover {
@@ -187,103 +200,116 @@ body > * {
     left: 0;
     bottom: -4px;
     width: 0;
-    height: 1px;
+    height: 2px;
     background: var(--color-gold);
-    transition: width 0.25s ease;
+    transition: width 0.2s steps(4);
 }
 
 .nav-link:hover::after {
     width: 100%;
 }
 
+/* Pixel push-button: hard black outline, flat fill, an offset drop-shadow
+   that collapses on press to mimic a sprite being pushed into the screen. */
 .btn-quest {
     font-family: var(--font-display);
-    letter-spacing: 0.05em;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    letter-spacing: 0.02em;
+    border: 2px solid var(--color-ink);
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+    transition: transform 0.08s steps(2), box-shadow 0.08s steps(2), background-color 0.1s ease;
 }
 
 .btn-quest:hover {
-    transform: translateY(-2px);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+}
+
+.btn-quest:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 0 var(--color-ink);
 }
 
 .btn-primary {
-    background: linear-gradient(180deg, var(--color-gold-bright), var(--color-gold));
-    color: #1b140d;
-    box-shadow: 0 6px 20px -6px rgba(217, 179, 74, 0.6);
+    background: var(--color-gold);
+    color: var(--color-ink);
 }
 
 .btn-primary:hover {
-    box-shadow: 0 10px 28px -6px rgba(217, 179, 74, 0.8);
+    background: var(--color-gold-bright);
 }
 
 .btn-ghost {
-    border: 1px solid rgba(217, 179, 74, 0.45);
+    background: var(--color-panel-solid);
+    border-color: var(--color-gold);
     color: var(--color-parchment);
 }
 
 .btn-ghost:hover {
-    background: rgba(217, 179, 74, 0.08);
+    background: rgba(255, 236, 39, 0.12);
 }
 
 /* Achievement card hover glow */
 .achievement-card {
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.15s steps(2), border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .achievement-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(217, 179, 74, 0.6);
-    box-shadow: 0 20px 40px -20px rgba(217, 179, 74, 0.35);
+    transform: translate(-3px, -3px);
+    box-shadow: 10px 10px 0 0 rgba(0, 0, 0, 0.6);
 }
 
 .achievement-card:hover .icon-badge {
-    box-shadow: 0 0 0 1px rgba(217, 179, 74, 0.7), 0 0 18px rgba(217, 179, 74, 0.45);
+    box-shadow: 0 0 0 2px var(--color-gold-bright), 0 0 14px rgba(255, 236, 39, 0.5);
 }
 
 /* Icon badge: the vessel for every SVG icon in the page (achievements,
-   quest ranks, guild scrolls) so icons share one consistent frame instead
-   of floating loose like inline emoji. */
+   experience ranks, certification list) so icons share one consistent
+   pixel slot instead of floating loose like inline emoji. */
 .icon-badge {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at 35% 30%, rgba(217, 179, 74, 0.18), rgba(13, 10, 8, 0.4));
-    border: 1px solid rgba(217, 179, 74, 0.45);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background: var(--color-panel-solid);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold);
     color: var(--color-gold-bright);
-    transition: box-shadow 0.2s ease;
+    border-radius: 0 !important;
+    transition: box-shadow 0.15s ease;
 }
 
-/* Concentric portrait ring for the hero avatar */
+/* Square portrait frame for the hero avatar -- concentric pixel border
+   instead of a soft glowing ring. */
 .avatar-ring {
+    border-radius: 0 !important;
     box-shadow:
-        0 0 0 4px rgba(13, 10, 8, 1),
-        0 0 0 5px rgba(217, 179, 74, 0.5),
-        0 0 24px rgba(217, 179, 74, 0.25);
+        0 0 0 3px var(--color-ink),
+        0 0 0 6px var(--color-gold),
+        6px 6px 0 0 rgba(0, 0, 0, 0.7);
 }
 
-/* Quest log timeline */
+/* Career timeline */
 .quest-line {
-    background: linear-gradient(180deg, var(--color-gold), transparent);
+    background: repeating-linear-gradient(180deg, var(--color-gold) 0 6px, transparent 6px 12px);
 }
 
 .quest-node {
-    box-shadow: 0 0 0 4px rgba(13, 10, 8, 1), 0 0 12px rgba(217, 179, 74, 0.7);
+    border-radius: 0 !important;
+    box-shadow: 0 0 0 3px var(--color-ink), 0 0 10px rgba(255, 236, 39, 0.7);
 }
 
-/* Scroll progress bar (top of page) styled like a boss/quest bar */
+/* Scroll progress bar (top of page) styled like a boss HP bar */
 #scroll-progress {
     background: linear-gradient(90deg, var(--color-crimson), var(--color-gold-bright));
-    box-shadow: 0 0 10px rgba(217, 179, 74, 0.6);
+    box-shadow: 0 0 10px rgba(255, 236, 39, 0.6);
 }
 
 @keyframes float-slow {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-8px); }
 }
 
 .animate-float-slow {
-    animation: float-slow 6s ease-in-out infinite;
+    animation: float-slow 2.4s steps(8) infinite;
 }
 
 @keyframes flicker {
@@ -294,5 +320,574 @@ body > * {
 }
 
 .animate-flicker {
-    animation: flicker 4s ease-in-out infinite;
+    animation: flicker 4s steps(6) infinite;
+}
+
+/* Arcade "Press Start" gate: blocks the page behind a title screen until the
+   visitor presses START, like an attract-mode screen. */
+.start-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-ink);
+    overflow: hidden;
+    transition: opacity 0.3s steps(6), visibility 0.3s steps(6);
+}
+
+.start-gate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.65) 0px,
+        rgba(0, 0, 0, 0.65) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+}
+
+.start-gate.is-dismissed {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.start-gate-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 90vw;
+    padding: 2rem;
+    text-align: center;
+}
+
+.start-gate-kicker {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--color-parchment-dim);
+}
+
+.start-gate-title {
+    margin-top: 1rem;
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: var(--color-gold-bright);
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.start-gate-sub {
+    margin-top: 0.75rem;
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-parchment-dim);
+}
+
+.start-btn {
+    display: inline-block;
+    margin-top: 2.5rem;
+    max-width: 85vw;
+    padding: 0.6em 1.4em;
+    font-size: 1.4rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink);
+    background: var(--color-gold);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+    transition: font-size 0.2s steps(6);
+}
+
+.start-btn:hover {
+    background: var(--color-gold-bright);
+}
+
+.start-gate-hint {
+    margin-top: 1.5rem;
+    min-height: 1.5em;
+    font-size: 1.1rem;
+    color: var(--color-parchment-dim);
+}
+
+/* Visitor XP HUD: floating game-style progress tracker (separate from the
+   hero's flavor-text level) that rewards scrolling through the page. */
+.xp-hud {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 55;
+    width: 11.5rem;
+    padding: 0.6rem 0.7rem;
+    background: var(--color-panel-solid);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold), 4px 4px 0 0 rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    transition: box-shadow 0.15s ease;
+}
+
+.xp-hud:hover,
+.xp-hud:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-gold-bright), 4px 4px 0 0 rgba(0, 0, 0, 0.7);
+    outline: none;
+}
+
+.xp-hud-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+}
+
+.xp-hud-level {
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-bright);
+}
+
+.xp-hud-count {
+    font-size: 1rem;
+    color: var(--color-parchment-dim);
+}
+
+.xp-hud .stat-track {
+    height: 0.6rem;
+}
+
+.xp-hud-cta {
+    margin-top: 0.45rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--color-parchment-dim);
+}
+
+/* Progress checklist panel: opens above the HUD, lists every XP task with a
+   pixel checkbox so the visitor can see exactly what still unlocks XP. */
+.xp-progress-panel {
+    position: fixed;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 58;
+    width: 17rem;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding: 0.9rem 1rem;
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 7px 7px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.xp-progress-panel[hidden] {
+    display: none;
+}
+
+.xp-progress-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.xp-progress-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.03em;
+    color: var(--color-gold-bright);
+}
+
+.xp-progress-close {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    line-height: 1;
+    color: var(--color-parchment-dim);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.1rem 0.35rem;
+}
+
+.xp-progress-close:hover {
+    color: var(--color-crimson-bright);
+}
+
+.xp-progress-sub {
+    margin-top: 0.5rem;
+    font-size: 1.05rem;
+    color: var(--color-parchment-dim);
+}
+
+.xp-progress-list {
+    margin-top: 0.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.xp-progress-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.45rem;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 236, 39, 0.15);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.xp-progress-item:hover {
+    background: rgba(255, 236, 39, 0.1);
+}
+
+.xp-progress-item .box {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--color-gold);
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    color: var(--color-gold-bright);
+}
+
+.xp-progress-item .label {
+    flex: 1;
+    color: var(--color-parchment);
+}
+
+.xp-progress-item .amount {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    color: var(--color-gold-bright);
+}
+
+.xp-progress-item.is-done {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.xp-progress-item.is-done .box {
+    border-color: var(--color-emerald);
+    background: rgba(0, 228, 54, 0.15);
+    color: var(--color-emerald-bright);
+}
+
+.xp-progress-item.is-done .label {
+    color: var(--color-parchment-dim);
+    text-decoration: line-through;
+}
+
+.xp-popup {
+    position: fixed;
+    left: 1.2rem;
+    bottom: 4.6rem;
+    z-index: 56;
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    color: var(--color-gold-bright);
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.xp-popup.is-active {
+    animation: xp-float 1.4s steps(10) forwards;
+}
+
+@keyframes xp-float {
+    0% { opacity: 0; transform: translateY(0); }
+    15% { opacity: 1; }
+    80% { opacity: 1; transform: translateY(-1.4rem); }
+    100% { opacity: 0; transform: translateY(-1.8rem); }
+}
+
+.level-up-toast {
+    position: fixed;
+    top: 5.5rem;
+    left: 50%;
+    z-index: 70;
+    padding: 0.9rem 1.4rem;
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -12px);
+    transition: opacity 0.15s steps(3), transform 0.15s steps(3);
+}
+
+.level-up-toast.is-active {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.level-up-toast .title {
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    color: var(--color-gold-bright);
+}
+
+.level-up-toast .sub {
+    margin-top: 0.35rem;
+    font-size: 1.15rem;
+    color: var(--color-parchment);
+}
+
+/* Character select screen: second title-screen step after START, where the
+   visitor picks a mascot that then follows them around the page. */
+.character-select {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+    background: var(--color-ink);
+}
+
+.character-select[hidden] {
+    display: none;
+}
+
+.character-select::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.65) 0px,
+        rgba(0, 0, 0, 0.65) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+}
+
+.character-select-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 48rem;
+    text-align: center;
+}
+
+.character-select-kicker {
+    font-size: 1rem;
+    color: var(--color-gold-bright);
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.character-select-sub {
+    margin-top: 0.75rem;
+    font-size: 1.3rem;
+    color: var(--color-parchment-dim);
+}
+
+.character-grid {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+}
+
+.character-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 1.75rem 1.25rem;
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+    transition: transform 0.12s steps(3), box-shadow 0.12s steps(3);
+}
+
+.character-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 0 0 0 3px var(--color-gold-bright), 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-card.is-picked {
+    box-shadow: 0 0 0 3px var(--color-emerald-bright), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.character-name {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-bright);
+}
+
+.character-tagline {
+    font-size: 1.05rem;
+    color: var(--color-parchment-dim);
+    text-align: center;
+}
+
+/* Pet companion: small mascot badge that wanders the screen on its own
+   (JS drives left/top, this just supplies the transition + idle bob), with
+   a speech-bubble that pops up on click or on its own timer. */
+.pet-companion {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 55;
+    transition: left 1.6s ease-in-out, top 1.6s ease-in-out;
+}
+
+.pet-companion[hidden] {
+    display: none;
+}
+
+.pet-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    background: var(--color-panel-solid);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold), 4px 4px 0 0 rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.pet-companion.is-facing-left .pet-avatar {
+    transform: scaleX(-1);
+}
+
+.pet-icon {
+    display: none;
+}
+
+.pet-icon.is-active {
+    display: inline-flex;
+}
+
+.pet-bubble {
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    margin-bottom: 0.6rem;
+    transform: translateX(-50%);
+    min-width: 10rem;
+    max-width: 14rem;
+    padding: 0.6rem 0.7rem;
+    background: var(--color-panel-solid);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold), 4px 4px 0 0 rgba(0, 0, 0, 0.7);
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    color: var(--color-parchment);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s steps(3);
+}
+
+.pet-bubble.is-active {
+    opacity: 1;
+}
+
+/* Guestbook comments: each entry shows the commenter's chosen mascot next
+   to their name, tying the character-select feature into the page's most
+   social/interactive corner. */
+.comment-form-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    flex-shrink: 0;
+    background: var(--color-ink);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold);
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 2px dashed rgba(255, 236, 39, 0.2);
+}
+
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.comment-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    background: var(--color-ink);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px var(--color-gold);
+}
+
+.comment-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.comment-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.comment-name {
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    color: var(--color-gold-bright);
+}
+
+.comment-time {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-parchment-dim);
+    white-space: nowrap;
+}
+
+.comment-message {
+    margin-top: 0.35rem;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    color: var(--color-parchment);
+    overflow-wrap: break-word;
+}
+
+.comment-empty {
+    padding: 1rem 0;
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-parchment-dim);
+}
+
+@keyframes comment-pop {
+    0% { opacity: 0; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.comment-item-new {
+    animation: comment-pop 0.25s steps(4);
 }

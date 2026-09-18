@@ -8,9 +8,9 @@ return [
     'hero' => [
         'name' => 'Muhammad Wira Margono',
         'class' => 'Full-Stack Developer & IT Engineer',
-        'title' => 'The Code Weaver',
+        'title' => 'Player One',
         'level' => 23,
-        'guild' => 'PT. Syifa Global Group',
+        'company' => 'PT. Syifa Global Group',
         'tagline' => 'Merancang sistem informasi rumah sakit, otomasi, dan solusi berbasis AI — dari ide sampai production, dengan fokus pada efisiensi dan keandalan.',
         'avatar_initial' => 'W',
         'location' => 'Banjarbaru, Kalimantan Selatan, Indonesia',
@@ -28,10 +28,10 @@ return [
     'about' => [
         'lore' => "Lulusan Teknik Informatika dengan IPK nyaris sempurna (3.92/4.00) dan predikat Lulusan Terbaik. Menjelajah dari pengembangan web full-stack, AI/Machine Learning, hingga operasional bisnis dan kepemimpinan teknis. Baik itu membangun aplikasi rumah sakit, merancang Decision Support System, maupun mengelola logistik bisnis end-to-end — fokusnya selalu sama: efisiensi, keandalan, dan kepuasan pengguna. Pernah menjadi Batch Representative untuk 100+ mahasiswa dan Founder bisnis rental sendiri, sehingga terbiasa mengelola stakeholder sekaligus turun langsung mengerjakan detail teknis.",
         'facts' => [
-            ['label' => 'Kelas', 'value' => 'Full-Stack Developer'],
-            ['label' => 'Sub-Kelas', 'value' => 'AI/ML Enthusiast'],
-            ['label' => 'Senjata Utama', 'value' => 'Laravel & Vue.js'],
-            ['label' => 'Sihir Sekunder', 'value' => 'Python & Machine Learning'],
+            ['label' => 'Peran', 'value' => 'Full-Stack Developer'],
+            ['label' => 'Fokus', 'value' => 'AI/ML Enthusiast'],
+            ['label' => 'Tools Utama', 'value' => 'Laravel & Vue.js'],
+            ['label' => 'Tools Sekunder', 'value' => 'Python & Machine Learning'],
         ],
     ],
 
@@ -45,7 +45,7 @@ return [
         ['name' => 'Networking (TCP/IP, Cisco)', 'value' => 65],
     ],
 
-    // Pengalaman kerja = "Quest Log"
+    // Pengalaman kerja = "Mission Log"
     'quests' => [
         [
             'title' => 'Staff IT R&D',
@@ -100,7 +100,7 @@ return [
         ],
         [
             'title' => 'DCMS (Document Control Management System)',
-            'badge' => 'scroll',
+            'badge' => 'document',
             'description' => 'Mendigitalkan manajemen rapat dan mensentralisasi workflow dokumen SOP, menstandarkan operasional di dua cabang rumah sakit.',
             'stack' => ['Laravel', 'MySQL'],
             'link' => '#',
@@ -178,15 +178,15 @@ return [
         ],
         [
             'title' => 'Portofolio Ini',
-            'badge' => 'castle',
+            'badge' => 'monitor',
             'period' => null,
-            'description' => 'Website portofolio bertema RPG fantasy ini sendiri — dibangun dengan Laravel + Tailwind, di-deploy ke Vercel.',
+            'description' => 'Website portofolio bertema pixel game ini sendiri — dibangun dengan Laravel + Tailwind, di-deploy ke Vercel.',
             'stack' => ['Laravel', 'Tailwind v4', 'Vite'],
             'link' => '#',
         ],
     ],
 
-    // Pendidikan & sertifikasi = "Guild Hall"
+    // Pendidikan & sertifikasi = "Education & Certifications"
     'education' => [
         [
             'title' => 'S1 Komputer, Teknik Informatika',

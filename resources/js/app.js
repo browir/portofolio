@@ -1,4 +1,8 @@
 import './bootstrap';
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Web Analytics
+inject();
 
 // Shared 8-bit sound engine: lazily opens a single AudioContext on the first
 // user gesture (autoplay policies require it) and synthesizes short blips

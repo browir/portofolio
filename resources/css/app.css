@@ -815,6 +815,252 @@ body > * {
     display: inline-flex;
 }
 
+/* Mode select screen: third title-screen step, choose Adventure (guided
+   quest storyline) vs Creative (free scroll, the site's classic layout). */
+.mode-select {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    padding: 2rem 1.5rem;
+    background: var(--color-ink);
+}
+
+.mode-select[hidden] {
+    display: none;
+}
+
+.mode-select::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: overlay;
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.65) 0px,
+        rgba(0, 0, 0, 0.65) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+}
+
+.mode-select-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 44rem;
+    text-align: center;
+}
+
+.mode-select-kicker {
+    font-size: 1rem;
+    color: var(--color-gold-bright);
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.mode-select-sub {
+    margin-top: 0.75rem;
+    font-size: 1.3rem;
+    color: var(--color-parchment-dim);
+}
+
+.mode-grid {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.mode-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem 1.5rem;
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    color: var(--color-parchment);
+    cursor: pointer;
+    transition: transform 0.12s steps(3), box-shadow 0.12s steps(3);
+}
+
+.mode-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 0 0 0 3px var(--color-gold-bright), 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.mode-card[data-mode="adventure"] {
+    background: linear-gradient(180deg, rgba(255, 0, 77, 0.14), var(--color-panel-solid) 65%);
+    box-shadow: 0 0 0 3px var(--color-crimson), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.mode-card[data-mode="adventure"]:hover {
+    box-shadow: 0 0 0 3px var(--color-crimson-bright), 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.mode-card[data-mode="creative"] {
+    background: linear-gradient(180deg, rgba(41, 173, 255, 0.14), var(--color-panel-solid) 65%);
+    box-shadow: 0 0 0 3px var(--color-arcane), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.mode-card[data-mode="creative"]:hover {
+    box-shadow: 0 0 0 3px #7bd4ff, 9px 9px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.mode-name {
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-bright);
+}
+
+.mode-tagline {
+    font-size: 1.05rem;
+    color: var(--color-parchment-dim);
+    text-align: center;
+}
+
+/* Adventure Mode: ambient weather layer behind the page content -- purely
+   decorative, so it never intercepts clicks. */
+.weather-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    mix-blend-mode: screen;
+}
+
+.weather-canvas.is-active {
+    opacity: 0.8;
+}
+
+/* Adventure Mode: quest-line panel under the nav that walks the visitor
+   through each section in order, like dialogue prompts in an RPG. */
+.quest-guide {
+    position: fixed;
+    top: 4.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 56;
+    width: min(92vw, 30rem);
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    padding: 0.9rem 1.1rem 1.1rem;
+}
+
+.quest-guide[hidden] {
+    display: none;
+}
+
+.quest-guide-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.quest-guide-step {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    color: var(--color-gold-bright);
+}
+
+.quest-guide-exit {
+    background: none;
+    border: none;
+    color: var(--color-parchment-dim);
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.quest-guide-exit:hover {
+    color: var(--color-crimson-bright);
+}
+
+.quest-guide-title {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--color-parchment);
+}
+
+.quest-guide-text {
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--color-parchment-dim);
+}
+
+.quest-guide-next {
+    margin-top: 0.85rem;
+    width: 100%;
+    padding: 0.6rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.03em;
+    background: var(--color-gold);
+    color: var(--color-ink);
+    border: 3px solid var(--color-ink);
+    box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+    transition: transform 0.1s steps(2), box-shadow 0.1s steps(2);
+}
+
+.quest-guide-next:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.quest-guide-next:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+}
+
+/* Sound mute toggle in the nav bar. */
+.sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-left: 1rem;
+    background: transparent;
+    border: 2px solid transparent;
+    color: var(--color-gold-bright);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.sound-toggle:hover,
+.sound-toggle:focus-visible {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+    outline: none;
+}
+
+.sound-toggle[aria-pressed="true"] {
+    color: var(--color-parchment-dim);
+}
+
+.sound-icon.is-off {
+    display: none;
+}
+
+.sound-toggle[aria-pressed="true"] .sound-icon.is-on {
+    display: none;
+}
+
+.sound-toggle[aria-pressed="true"] .sound-icon.is-off {
+    display: inline-flex;
+}
+
 .pet-bubble {
     position: absolute;
     left: 50%;

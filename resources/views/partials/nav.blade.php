@@ -28,6 +28,11 @@
             LinkedIn
         </a>
 
+        <button type="button" id="sound-toggle" class="sound-toggle" aria-pressed="false" aria-label="Matikan suara">
+            <span class="sound-icon is-on"><x-icon name="sound-on" class="h-5 w-5" /></span>
+            <span class="sound-icon is-off"><x-icon name="sound-off" class="h-5 w-5" /></span>
+        </button>
+
         <button id="nav-toggle" class="text-[#fff7a0] md:hidden" aria-label="Buka menu">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />

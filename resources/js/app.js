@@ -1,5 +1,157 @@
 import './bootstrap';
 
+// Shared 8-bit sound engine: lazily opens a single AudioContext on the first
+// user gesture (autoplay policies require it) and synthesizes short blips
+// with oscillators plus filtered-noise ambience loops, so no audio files
+// need to be shipped. Mute preference persists per-browser.
+const Sound = (function () {
+    const STORAGE_KEY = 'portfolio_sound_muted';
+    let ctx = null;
+    let muted = false;
+    let ambient = null;
+    let ambientType = null;
+
+    try {
+        muted = localStorage.getItem(STORAGE_KEY) === '1';
+    } catch (e) {
+        // ignore unavailable storage
+    }
+
+    function resume() {
+        if (!ctx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) return null;
+            ctx = new AudioContextClass();
+        }
+        if (ctx.state === 'suspended') ctx.resume();
+        return ctx;
+    }
+
+    function beep({ freq, duration, type, gain, slideTo }) {
+        if (muted) return;
+        const audioCtx = resume();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const amp = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, audioCtx.currentTime + duration);
+
+        amp.gain.setValueAtTime(gain, audioCtx.currentTime);
+        amp.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+        osc.connect(amp).connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function noiseBuffer(audioCtx) {
+        const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i += 1) data[i] = Math.random() * 2 - 1;
+        return buffer;
+    }
+
+    // Ambient weather beds are just filtered noise -- lowpassed hiss reads as
+    // rain, a thin highpassed hush as autumn wind -- so each Adventure Mode
+    // quest stop gets its own atmosphere with no audio assets to ship.
+    const ambientProfiles = {
+        rain: { filter: 'lowpass', freq: 1400, q: 0.6, gain: 0.05 },
+        snow: { filter: 'lowpass', freq: 500, q: 0.4, gain: 0.025 },
+        autumn: { filter: 'highpass', freq: 800, q: 0.3, gain: 0.03 },
+        sunny: { filter: 'bandpass', freq: 2200, q: 1.2, gain: 0.015 },
+    };
+
+    function stopAmbient() {
+        if (!ambient) return;
+        const { source, gain } = ambient;
+        if (ctx) {
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.6);
+            window.setTimeout(() => {
+                try {
+                    source.stop();
+                } catch (e) {
+                    // already stopped
+                }
+            }, 650);
+        }
+        ambient = null;
+        ambientType = null;
+    }
+
+    function playAmbient(type) {
+        if (type === ambientType) return;
+        stopAmbient();
+        if (!type || muted || !ambientProfiles[type]) return;
+
+        const audioCtx = resume();
+        if (!audioCtx) return;
+        const profile = ambientProfiles[type];
+
+        const source = audioCtx.createBufferSource();
+        source.buffer = noiseBuffer(audioCtx);
+        source.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = profile.filter;
+        filter.frequency.value = profile.freq;
+        filter.Q.value = profile.q;
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(profile.gain, audioCtx.currentTime + 1.2);
+
+        source.connect(filter).connect(gain).connect(audioCtx.destination);
+        source.start();
+
+        ambient = { source, gain };
+        ambientType = type;
+    }
+
+    function setMuted(next) {
+        muted = next;
+        try {
+            localStorage.setItem(STORAGE_KEY, muted ? '1' : '0');
+        } catch (e) {
+            // ignore unavailable storage
+        }
+        if (muted) stopAmbient();
+        else if (ambientType) playAmbient(ambientType);
+    }
+
+    return {
+        isMuted: () => muted,
+        setMuted,
+        playAmbient,
+        stopAmbient,
+        blip: () => beep({ freq: 520, duration: 0.05, type: 'square', gain: 0.05 }),
+        confirm: () => beep({ freq: 660, duration: 0.14, type: 'square', gain: 0.07, slideTo: 990 }),
+        select: () => beep({ freq: 440, duration: 0.1, type: 'square', gain: 0.06, slideTo: 660 }),
+        advance: () => beep({ freq: 500, duration: 0.09, type: 'triangle', gain: 0.06, slideTo: 780 }),
+        exit: () => beep({ freq: 420, duration: 0.12, type: 'square', gain: 0.06, slideTo: 220 }),
+    };
+})();
+
+// Sound mute toggle in the nav bar; purely a localStorage flag Sound reads.
+(function () {
+    const btn = document.getElementById('sound-toggle');
+    if (!btn) return;
+
+    function render() {
+        const muted = Sound.isMuted();
+        btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+        btn.setAttribute('aria-label', muted ? 'Nyalakan suara' : 'Matikan suara');
+    }
+
+    btn.addEventListener('click', () => {
+        Sound.setMuted(!Sound.isMuted());
+        render();
+    });
+
+    render();
+})();
+
 // Arcade "Press Start" gate: blocks the page until the visitor presses
 // START. Clicking anywhere else on the title screen makes the button grow,
 // so it becomes impossible to miss.
@@ -29,9 +181,12 @@ import './bootstrap';
         const size = Math.min(BASE_SIZE + misses * STEP, MAX_SIZE);
         btn.style.fontSize = `${size}rem`;
         if (hint) hint.textContent = hints[Math.min(misses, hints.length - 1)];
+        Sound.blip();
     }
 
     function dismiss() {
+        Sound.confirm();
+
         // Reveal character-select *before* the gate starts fading, so it's
         // already sitting behind the gate (z-index just below it) the
         // instant the fade begins -- otherwise the dashboard peeks through
@@ -165,6 +320,7 @@ import './bootstrap';
     function choose(id) {
         if (!characters[id]) return;
         currentChoice = id;
+        Sound.select();
 
         try {
             localStorage.setItem(STORAGE_KEY, id);
@@ -173,7 +329,6 @@ import './bootstrap';
         }
 
         select.hidden = true;
-        document.body.style.overflow = '';
 
         if (pet) {
             pet.hidden = false;
@@ -184,7 +339,17 @@ import './bootstrap';
             scheduleAutoQuote();
         }
 
-        window.dispatchEvent(new CustomEvent('game:start'));
+        // Next title-screen step: let the visitor choose Adventure (guided
+        // quest storyline) vs Creative (classic free scroll) before the page
+        // unlocks. If that screen isn't in the DOM for some reason, fall
+        // back to the old behaviour and start the page straight away.
+        const modeSelect = document.getElementById('mode-select');
+        if (modeSelect) {
+            modeSelect.hidden = false;
+        } else {
+            document.body.style.overflow = '';
+            window.dispatchEvent(new CustomEvent('game:start'));
+        }
     }
 
     select.querySelectorAll('.character-card').forEach((card) => {
@@ -196,6 +361,237 @@ import './bootstrap';
             e.stopPropagation();
             sayRandomQuote();
             scheduleAutoQuote();
+        });
+    }
+})();
+
+// Mode select: third title-screen step after character pick. Adventure Mode
+// walks the visitor through each section as a guided quest line (with an
+// ambient weather effect per stop); Creative Mode is the classic free-scroll
+// experience this site always had.
+(function () {
+    const modeSelect = document.getElementById('mode-select');
+    if (!modeSelect) return;
+
+    function pick(mode) {
+        Sound.confirm();
+        modeSelect.hidden = true;
+        document.body.style.overflow = '';
+        window.dispatchEvent(new CustomEvent('game:start'));
+        if (mode === 'adventure') window.dispatchEvent(new CustomEvent('adventure:start'));
+    }
+
+    modeSelect.querySelectorAll('.mode-card').forEach((card) => {
+        card.addEventListener('click', () => pick(card.dataset.mode));
+    });
+})();
+
+// Adventure Mode: guided quest line through the page's sections, with a
+// dialogue-style panel and an ambient weather effect (visual + audio) per
+// stop. Listens for the same section ids the XP HUD already tracks, so
+// manual scrolling -- not just the "next quest" button -- keeps it in sync.
+(function () {
+    const panel = document.getElementById('quest-guide');
+    if (!panel) return;
+
+    const canvas = document.getElementById('weather-canvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+
+    const steps = [
+        { id: 'top', title: 'Gerbang Portofolio', text: 'Perjalanan dimulai di sini, Player. Tarik napas -- dunia ini siap dijelajahi.', weather: 'sunny' },
+        { id: 'about', title: 'Kenali Sang Karakter', text: 'Sebelum lanjut, kenalan dulu sama pemilik dunia ini lewat lore-nya.', weather: 'autumn' },
+        { id: 'stats', title: 'Skill Tree', text: 'Lihat stat yang sudah di-level-up lewat bertahun-tahun latihan.', weather: 'sunny' },
+        { id: 'experience', title: 'Medan Pertempuran', text: 'Mission Log: quest-quest nyata yang pernah ditaklukkan di dunia kerja.', weather: 'rain' },
+        { id: 'achievements', title: 'Ruang Trofi', text: 'Bukti dari setiap quest yang berhasil diselesaikan sampai tuntas.', weather: 'snow' },
+        { id: 'education', title: 'Balai Guild', text: 'Tempat sang karakter dilatih, disertifikasi, dan naik rank.', weather: 'autumn' },
+        { id: 'contact', title: 'Portal Komunikasi', text: 'Mau merekrut karakter ini ke party-mu? Kirim pesan lewat portal ini.', weather: 'snow' },
+        { id: 'comments', title: 'Balai Warga', text: 'Quest terakhir: tinggalkan jejakmu di guestbook sebelum lanjut ke petualangan lain.', weather: 'rain' },
+    ];
+
+    const stepEl = panel.querySelector('.js-quest-step');
+    const titleEl = panel.querySelector('.js-quest-title');
+    const textEl = panel.querySelector('.js-quest-text');
+    const nextBtn = document.getElementById('quest-guide-next');
+    const exitBtn = document.getElementById('quest-guide-exit');
+
+    let active = false;
+    let current = 0;
+
+    // --- Weather engine (rain / snow / autumn leaves / sunny motes) -------
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let particles = [];
+    let currentWeather = null;
+    let rafId = null;
+    let width = 0;
+    let height = 0;
+
+    function resize() {
+        if (!canvas) return;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function spawn(type, initial) {
+        const x = Math.random() * width;
+        const y = initial ? Math.random() * height : -20;
+        if (type === 'rain') {
+            return { x, y, len: 12 + Math.random() * 14, speed: 7 + Math.random() * 5, drift: -1.5 };
+        }
+        if (type === 'snow') {
+            return { x, y, r: 1.5 + Math.random() * 2.5, speed: 0.6 + Math.random() * 1.2, sway: Math.random() * Math.PI * 2, swaySpeed: 0.01 + Math.random() * 0.02 };
+        }
+        if (type === 'autumn') {
+            return {
+                x, y, size: 5 + Math.random() * 5, speed: 0.8 + Math.random() * 1,
+                sway: Math.random() * Math.PI * 2, swaySpeed: 0.015 + Math.random() * 0.02,
+                rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.05,
+                color: ['#ffec27', '#ff9d3d', '#ff004d'][Math.floor(Math.random() * 3)],
+            };
+        }
+        return { x, y: initial ? Math.random() * height : height + 10, r: 1 + Math.random() * 2, speed: 0.2 + Math.random() * 0.3, twinkle: Math.random() * Math.PI * 2 };
+    }
+
+    function makeParticles(type) {
+        resize();
+        const count = { rain: 90, snow: 70, autumn: 45, sunny: 26 }[type] || 0;
+        return Array.from({ length: count }, () => spawn(type, true));
+    }
+
+    function draw() {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+
+        if (currentWeather === 'rain') {
+            ctx.strokeStyle = 'rgba(158, 210, 255, 0.55)';
+            ctx.lineWidth = 1.5;
+            particles.forEach((p) => {
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x + p.drift, p.y + p.len);
+                ctx.stroke();
+                p.y += p.speed;
+                p.x += p.drift * 0.2;
+                if (p.y > height) Object.assign(p, spawn('rain', false));
+            });
+        } else if (currentWeather === 'snow') {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            particles.forEach((p) => {
+                p.sway += p.swaySpeed;
+                p.x += Math.sin(p.sway) * 0.6;
+                p.y += p.speed;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.y > height) Object.assign(p, spawn('snow', false));
+            });
+        } else if (currentWeather === 'autumn') {
+            particles.forEach((p) => {
+                p.sway += p.swaySpeed;
+                p.rotation += p.rotSpeed;
+                p.x += Math.sin(p.sway) * 0.8;
+                p.y += p.speed;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+                ctx.restore();
+                if (p.y > height) Object.assign(p, spawn('autumn', false));
+            });
+        } else if (currentWeather === 'sunny') {
+            particles.forEach((p) => {
+                p.twinkle += 0.05;
+                p.y -= p.speed;
+                const alpha = Math.max(0.15, 0.4 + Math.sin(p.twinkle) * 0.4);
+                ctx.fillStyle = `rgba(255, 236, 39, ${alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.y < -10) Object.assign(p, spawn('sunny', false));
+            });
+        }
+
+        rafId = window.requestAnimationFrame(draw);
+    }
+
+    function setWeather(type) {
+        if (type === currentWeather) return;
+        currentWeather = type;
+
+        Sound.playAmbient(type);
+
+        if (!canvas || !ctx || reduceMotion) return;
+
+        if (!type) {
+            canvas.classList.remove('is-active');
+            if (rafId) window.cancelAnimationFrame(rafId);
+            rafId = null;
+            particles = [];
+            return;
+        }
+
+        particles = makeParticles(type);
+        canvas.classList.add('is-active');
+        if (!rafId) rafId = window.requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- Quest line ---------------------------------------------------
+    function renderStep(index) {
+        const step = steps[index];
+        if (!step) return;
+        current = index;
+        if (stepEl) stepEl.textContent = `QUEST ${index + 1}/${steps.length}`;
+        if (titleEl) titleEl.textContent = step.title;
+        if (textEl) textEl.textContent = step.text;
+        if (nextBtn) {
+            const isLast = index === steps.length - 1;
+            nextBtn.textContent = isLast ? 'QUEST SELESAI! ✓' : 'LANJUTKAN QUEST ▸';
+            nextBtn.disabled = isLast;
+        }
+        setWeather(step.weather);
+    }
+
+    function goNext() {
+        Sound.advance();
+        const next = Math.min(current + 1, steps.length - 1);
+        const target = document.getElementById(steps[next].id);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function exitAdventure() {
+        Sound.exit();
+        active = false;
+        panel.hidden = true;
+        setWeather(null);
+    }
+
+    if (nextBtn) nextBtn.addEventListener('click', goNext);
+    if (exitBtn) exitBtn.addEventListener('click', exitAdventure);
+
+    window.addEventListener('adventure:start', () => {
+        active = true;
+        panel.hidden = false;
+        renderStep(0);
+    });
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (!active) return;
+                entries.forEach((entry) => {
+                    if (!entry.isIntersecting) return;
+                    const index = steps.findIndex((step) => step.id === entry.target.id);
+                    if (index !== -1) renderStep(index);
+                });
+            },
+            { threshold: 0, rootMargin: '0px 0px -55% 0px' }
+        );
+        steps.forEach((step) => {
+            const el = document.getElementById(step.id);
+            if (el) observer.observe(el);
         });
     }
 })();

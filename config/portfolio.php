@@ -9,7 +9,7 @@ return [
         'name' => 'Muhammad Wira Margono',
         'class' => 'Full-Stack Developer & IT Engineer',
         'title' => 'Player One',
-        'level' => 23,
+        'level' => 24,
         'company' => 'PT. Syifa Global Group',
         'tagline' => 'Merancang sistem informasi untuk keperluan rumah sakit, otomasi, dan solusi berbasis AI — dari ide sampai production, dengan fokus pada efisiensi dan keandalan.',
         'avatar_initial' => 'W',
@@ -41,7 +41,7 @@ return [
         ['name' => 'JavaScript / Vue.js', 'value' => 80],
         ['name' => 'Tailwind CSS / Bootstrap', 'value' => 85],
         ['name' => 'MySQL & Database Design', 'value' => 82],
-        ['name' => 'Python & Machine Learning', 'value' => 68],
+        ['name' => 'Python & Machine Learning', 'value' => 88],
         ['name' => 'Networking (TCP/IP, Cisco)', 'value' => 65],
     ],
 

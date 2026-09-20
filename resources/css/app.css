@@ -967,6 +967,66 @@ body > * {
     gap: 0.75rem;
 }
 
+/* NPC dialogue row: the chosen companion "speaks" the storyline at each
+   quest stop, RPG-textbox style -- portrait on the left, a speech bubble
+   with a pointer tail on the right. */
+.quest-guide-npc {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+}
+
+.quest-guide-portrait {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    background: var(--color-ink);
+    border: 2px solid var(--color-gold);
+    box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+.npc-icon {
+    display: none;
+}
+
+.npc-icon.is-active {
+    display: inline-flex;
+}
+
+.quest-guide-bubble {
+    position: relative;
+    flex: 1;
+    background: rgba(255, 236, 39, 0.08);
+    border: 2px solid var(--color-gold);
+    padding: 0.4rem 0.65rem 0.5rem;
+}
+
+.quest-guide-bubble::before {
+    content: '';
+    position: absolute;
+    left: -0.5rem;
+    top: 0.65rem;
+    border: 0.3rem solid transparent;
+    border-right-color: var(--color-gold);
+}
+
+.quest-guide-npc-name {
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-bright);
+}
+
+.quest-guide-npc-line {
+    margin-top: 0.25rem;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--color-parchment);
+}
+
 .quest-guide-step {
     font-size: 0.6rem;
     letter-spacing: 0.05em;

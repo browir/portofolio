@@ -408,14 +408,70 @@ const Sound = (function () {
         { id: 'comments', title: 'Balai Warga', text: 'Quest terakhir: tinggalkan jejakmu di guestbook sebelum lanjut ke petualangan lain.', weather: 'rain' },
     ];
 
+    // The chosen companion doubles as the quest-giver NPC: same portrait as
+    // the pet, one flavor line per personality at every quest stop, so the
+    // storyline reads as being told to you rather than just labelled.
+    const PET_KEY = 'portfolio_pet_choice';
+    const npcNames = { knight: 'SIR KNIGHT', princess: 'PRINCESS', dragon: 'DRAGON' };
+    const npcLines = {
+        knight: [
+            'Selamat datang, Player. Gerbang ini sudah kujaga -- melangkahlah tanpa ragu.',
+            'Kisah pemilik dunia ini layak didengar oleh siapa pun yang ingin bertarung di sisinya.',
+            'Setiap batang skill ini kutempa lewat latihan tanpa henti. Perhatikan baik-baik.',
+            'Medan pertempuran sesungguhnya, Player. Aku pernah berdiri di garis depannya.',
+            'Setiap trofi di ruangan ini dibayar dengan keringat, bukan keberuntungan.',
+            'Di balai inilah aku dulu dilatih dan disumpah. Hormatilah tempat ini.',
+            'Kirim pesanmu lewat portal ini -- aku akan mengawalnya sampai terkirim.',
+            'Tulis jejakmu di buku tamu. Petualangan besar butuh saksi yang setia.',
+        ],
+        princess: [
+            'Selamat datang di duniaku, Player. Mari jelajahi dengan anggun dan penuh rencana.',
+            'Sebelum melangkah jauh, kenalilah dulu siapa yang merancang kerajaan kode ini.',
+            'Setiap kemampuan ini kususun seperti strategi catur -- satu per satu, penuh perhitungan.',
+            'Inilah rangkaian misi yang pernah kupimpin. Lihat bagaimana strategi itu menang.',
+            'Setiap piala di sini adalah bukti rencana yang berhasil dieksekusi sempurna.',
+            'Balai ini tempatku belajar menyusun taktik sebelum terjun ke medan sesungguhnya.',
+            'Kirimkan pesanmu lewat portal ini -- aku akan memastikannya sampai dengan anggun.',
+            'Tinggalkan jejakmu di buku tamu ini. Setiap kunjungan berharga bagi kerajaan kita.',
+        ],
+        dragon: [
+            'Grrr... akhirnya ada yang berani masuk. Ikuti aku, jangan sampai ketinggalan!',
+            'Kenali dulu siapa yang berani memeliharaku. Jangan meremehkan ceritanya.',
+            'Kekuatan ini bukan didapat dengan tidur, Player. Lihat sendiri hasilnya.',
+            'Ini medan pertempuran sungguhan -- aku ikut membakar setiap rintangannya.',
+            'Tumpukan trofi ini hasil pertarungan nyata. Aku saksinya.',
+            'Sarang tempatnya dilatih jadi lebih kuat. Bahkan aku hormat sama tempat ini.',
+            'Mau kirim pesan? Lewat sini. Jangan bikin aku menunggu lama.',
+            'Tulis komentarmu. Atau aku yang "komentari" dengan api. Bercanda... mungkin.',
+        ],
+    };
+
     const stepEl = panel.querySelector('.js-quest-step');
     const titleEl = panel.querySelector('.js-quest-title');
     const textEl = panel.querySelector('.js-quest-text');
+    const npcNameEl = panel.querySelector('.js-npc-name');
+    const npcLineEl = panel.querySelector('.js-npc-line');
+    const npcIcons = panel.querySelectorAll('.npc-icon');
     const nextBtn = document.getElementById('quest-guide-next');
     const exitBtn = document.getElementById('quest-guide-exit');
 
     let active = false;
     let current = 0;
+    let activeNpc = 'knight';
+
+    function setNpc(id) {
+        activeNpc = npcNames[id] ? id : 'knight';
+        if (npcNameEl) npcNameEl.textContent = npcNames[activeNpc];
+        npcIcons.forEach((el) => el.classList.toggle('is-active', el.dataset.character === activeNpc));
+    }
+
+    function currentPetChoice() {
+        try {
+            return localStorage.getItem(PET_KEY);
+        } catch (e) {
+            return null;
+        }
+    }
 
     // --- Weather engine (rain / snow / autumn leaves / sunny motes) -------
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -546,6 +602,7 @@ const Sound = (function () {
         if (stepEl) stepEl.textContent = `QUEST ${index + 1}/${steps.length}`;
         if (titleEl) titleEl.textContent = step.title;
         if (textEl) textEl.textContent = step.text;
+        if (npcLineEl) npcLineEl.textContent = `“${npcLines[activeNpc][index]}”`;
         if (nextBtn) {
             const isLast = index === steps.length - 1;
             nextBtn.textContent = isLast ? 'QUEST SELESAI! ✓' : 'LANJUTKAN QUEST ▸';
@@ -574,6 +631,7 @@ const Sound = (function () {
     window.addEventListener('adventure:start', () => {
         active = true;
         panel.hidden = false;
+        setNpc(currentPetChoice());
         renderStep(0);
     });
 

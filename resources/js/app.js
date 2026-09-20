@@ -120,16 +120,27 @@ const Sound = (function () {
         else if (ambientType) playAmbient(ambientType);
     }
 
+    // A short ascending fanfare for finishing every quest.
+    function victory() {
+        if (muted) return;
+        const notes = [392.0, 523.25, 659.25, 783.99, 1046.5];
+        notes.forEach((f, i) => {
+            window.setTimeout(() => beep({ freq: f, duration: 0.22, type: 'square', gain: 0.06 }), i * 110);
+        });
+    }
+
     return {
         isMuted: () => muted,
         setMuted,
         playAmbient,
         stopAmbient,
+        victory,
         blip: () => beep({ freq: 520, duration: 0.05, type: 'square', gain: 0.05 }),
         confirm: () => beep({ freq: 660, duration: 0.14, type: 'square', gain: 0.07, slideTo: 990 }),
         select: () => beep({ freq: 440, duration: 0.1, type: 'square', gain: 0.06, slideTo: 660 }),
         advance: () => beep({ freq: 500, duration: 0.09, type: 'triangle', gain: 0.06, slideTo: 780 }),
         exit: () => beep({ freq: 420, duration: 0.12, type: 'square', gain: 0.06, slideTo: 220 }),
+        achievement: () => beep({ freq: 740, duration: 0.16, type: 'triangle', gain: 0.06, slideTo: 1180 }),
     };
 })();
 
@@ -408,69 +419,123 @@ const Sound = (function () {
         { id: 'comments', title: 'Balai Warga', text: 'Quest terakhir: tinggalkan jejakmu di guestbook sebelum lanjut ke petualangan lain.', weather: 'rain' },
     ];
 
-    // The chosen companion doubles as the quest-giver NPC: same portrait as
-    // the pet, one flavor line per personality at every quest stop, so the
-    // storyline reads as being told to you rather than just labelled.
-    const PET_KEY = 'portfolio_pet_choice';
-    const npcNames = { knight: 'SIR KNIGHT', princess: 'PRINCESS', dragon: 'DRAGON' };
-    const npcLines = {
-        knight: [
-            'Selamat datang, Player. Gerbang ini sudah kujaga -- melangkahlah tanpa ragu.',
-            'Kisah pemilik dunia ini layak didengar oleh siapa pun yang ingin bertarung di sisinya.',
-            'Setiap batang skill ini kutempa lewat latihan tanpa henti. Perhatikan baik-baik.',
-            'Medan pertempuran sesungguhnya, Player. Aku pernah berdiri di garis depannya.',
-            'Setiap trofi di ruangan ini dibayar dengan keringat, bukan keberuntungan.',
-            'Di balai inilah aku dulu dilatih dan disumpah. Hormatilah tempat ini.',
-            'Kirim pesanmu lewat portal ini -- aku akan mengawalnya sampai terkirim.',
-            'Tulis jejakmu di buku tamu. Petualangan besar butuh saksi yang setia.',
-        ],
-        princess: [
-            'Selamat datang di duniaku, Player. Mari jelajahi dengan anggun dan penuh rencana.',
-            'Sebelum melangkah jauh, kenalilah dulu siapa yang merancang kerajaan kode ini.',
-            'Setiap kemampuan ini kususun seperti strategi catur -- satu per satu, penuh perhitungan.',
-            'Inilah rangkaian misi yang pernah kupimpin. Lihat bagaimana strategi itu menang.',
-            'Setiap piala di sini adalah bukti rencana yang berhasil dieksekusi sempurna.',
-            'Balai ini tempatku belajar menyusun taktik sebelum terjun ke medan sesungguhnya.',
-            'Kirimkan pesanmu lewat portal ini -- aku akan memastikannya sampai dengan anggun.',
-            'Tinggalkan jejakmu di buku tamu ini. Setiap kunjungan berharga bagi kerajaan kita.',
-        ],
-        dragon: [
-            'Grrr... akhirnya ada yang berani masuk. Ikuti aku, jangan sampai ketinggalan!',
-            'Kenali dulu siapa yang berani memeliharaku. Jangan meremehkan ceritanya.',
-            'Kekuatan ini bukan didapat dengan tidur, Player. Lihat sendiri hasilnya.',
-            'Ini medan pertempuran sungguhan -- aku ikut membakar setiap rintangannya.',
-            'Tumpukan trofi ini hasil pertarungan nyata. Aku saksinya.',
-            'Sarang tempatnya dilatih jadi lebih kuat. Bahkan aku hormat sama tempat ini.',
-            'Mau kirim pesan? Lewat sini. Jangan bikin aku menunggu lama.',
-            'Tulis komentarmu. Atau aku yang "komentari" dengan api. Bercanda... mungkin.',
-        ],
-    };
+    // The quest-giver NPC is the portfolio owner in first person -- a
+    // separate persona from the wandering pet companion, so the two don't
+    // read as the same character shown twice. Name/avatar come from the
+    // hero data server-side; only the per-stop lines live here.
+    const npcLines = [
+        'Halo, Player! Aku yang punya dunia ini -- makasih udah mampir. Yuk, kutemani jelajahi perjalananku dari awal.',
+        'Ini ceritaku -- dari lulus kuliah dengan IPK nyaris sempurna sampai jatuh cinta sama dunia development.',
+        'Ini skill yang kuasah bertahun-tahun -- dari Laravel, Python, sampai Machine Learning.',
+        'Ini rekam jejak kerjaku -- dari staff IT programmer sampai R&D. Semua nyata, bukan cuma teori.',
+        'Proyek-proyek yang paling kubanggakan ada di sini. Masing-masing punya cerita perjuangannya sendiri.',
+        'Latar belakang pendidikan dan sertifikasi yang membentukku jadi developer seperti sekarang.',
+        'Kalau kamu tertarik kolaborasi atau sekadar say hi, ini caranya menghubungiku.',
+        'Sebelum lanjut ke petualangan lain, boleh tinggalkan jejak di buku tamu ini? Aku bakal baca satu-satu.',
+    ];
 
     const stepEl = panel.querySelector('.js-quest-step');
     const titleEl = panel.querySelector('.js-quest-title');
     const textEl = panel.querySelector('.js-quest-text');
-    const npcNameEl = panel.querySelector('.js-npc-name');
     const npcLineEl = panel.querySelector('.js-npc-line');
-    const npcIcons = panel.querySelectorAll('.npc-icon');
+    const portraitEl = panel.querySelector('.quest-guide-portrait');
     const nextBtn = document.getElementById('quest-guide-next');
     const exitBtn = document.getElementById('quest-guide-exit');
 
     let active = false;
     let current = 0;
-    let activeNpc = 'knight';
 
-    function setNpc(id) {
-        activeNpc = npcNames[id] ? id : 'knight';
-        if (npcNameEl) npcNameEl.textContent = npcNames[activeNpc];
-        npcIcons.forEach((el) => el.classList.toggle('is-active', el.dataset.character === activeNpc));
-    }
+    // The wandering pet (knight/princess/dragon) is a separate persona from
+    // the quest-giver NPC above -- this only reads its choice, for the
+    // checkpoint (which character-select card to replay) and the ending
+    // screen's "companion" stat.
+    const PET_KEY = 'portfolio_pet_choice';
+    const petDisplayNames = { knight: 'KNIGHT', princess: 'PRINCESS', dragon: 'DRAGON' };
 
     function currentPetChoice() {
         try {
-            return localStorage.getItem(PET_KEY);
+            const saved = localStorage.getItem(PET_KEY);
+            return petDisplayNames[saved] ? saved : null;
         } catch (e) {
             return null;
         }
+    }
+
+    // --- Checkpoint: remember progress so a reload mid-adventure can pick
+    // back up instead of forcing a restart from the title screen. ----------
+    const PROGRESS_KEY = 'portfolio_adventure_progress';
+
+    function saveProgress() {
+        try {
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify({ character: currentPetChoice() || 'knight', step: current }));
+        } catch (e) {
+            // ignore unavailable storage
+        }
+    }
+
+    function clearProgress() {
+        try {
+            localStorage.removeItem(PROGRESS_KEY);
+        } catch (e) {
+            // ignore unavailable storage
+        }
+    }
+
+    // --- Achievement toasts at a couple of story beats ---------------------
+    const achievementToast = document.getElementById('achievement-toast');
+    const achievementSubEl = achievementToast ? achievementToast.querySelector('.js-achievement-sub') : null;
+    const achievementMilestones = { 0: 'Petualangan Dimulai!', 4: 'Mencapai Ruang Trofi!' };
+    const achievedMilestones = new Set();
+    let achievementTimer = null;
+
+    function showAchievement(text) {
+        if (!achievementToast) return;
+        Sound.achievement();
+        if (achievementSubEl) achievementSubEl.textContent = text;
+        achievementToast.classList.add('is-active');
+        window.clearTimeout(achievementTimer);
+        achievementTimer = window.setTimeout(() => achievementToast.classList.remove('is-active'), 3200);
+    }
+
+    // --- Quest journal: on-demand overview of all stops with their status -
+    const journalBtn = document.getElementById('quest-guide-journal-btn');
+    const journalPanel = document.getElementById('quest-journal');
+    const journalList = journalPanel ? journalPanel.querySelector('.js-journal-list') : null;
+    const journalClose = document.getElementById('quest-journal-close');
+
+    function closeJournal() {
+        if (journalPanel) journalPanel.hidden = true;
+    }
+
+    function openJournal() {
+        if (!journalPanel || !journalList) return;
+        journalList.innerHTML = '';
+        steps.forEach((step, index) => {
+            const done = index < current;
+            const isCurrent = index === current;
+            const li = document.createElement('li');
+            li.className = `quest-journal-item${done ? ' is-done' : ''}${isCurrent ? ' is-current' : ''}`;
+            li.innerHTML = `
+                <span class="box">${done ? '✓' : index + 1}</span>
+                <span class="label font-body">${step.title}</span>
+            `;
+            li.addEventListener('click', () => {
+                Sound.blip();
+                closeJournal();
+                const target = document.getElementById(step.id);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            journalList.appendChild(li);
+        });
+        journalPanel.hidden = false;
+    }
+
+    if (journalBtn) journalBtn.addEventListener('click', openJournal);
+    if (journalClose) journalClose.addEventListener('click', closeJournal);
+    if (journalPanel) {
+        journalPanel.addEventListener('click', (e) => {
+            if (e.target === journalPanel) closeJournal();
+        });
     }
 
     // --- Weather engine (rain / snow / autumn leaves / sunny motes) -------
@@ -595,6 +660,25 @@ const Sound = (function () {
     resize();
 
     // --- Quest line ---------------------------------------------------
+    // The panel docks over the bottom of the viewport, so the page reserves
+    // matching space (body padding-bottom) equal to its real rendered
+    // height -- otherwise it would sit on top of whatever section the
+    // visitor scrolled to instead of living in its own strip.
+    function updateBodyOffset() {
+        if (!panel || panel.hidden) {
+            document.documentElement.style.removeProperty('--quest-guide-space');
+            return;
+        }
+        const rect = panel.getBoundingClientRect();
+        const space = Math.max(window.innerHeight - rect.top + 24, 0);
+        document.documentElement.style.setProperty('--quest-guide-space', `${space}px`);
+    }
+
+    if ('ResizeObserver' in window) {
+        new ResizeObserver(updateBodyOffset).observe(panel);
+    }
+    window.addEventListener('resize', updateBodyOffset);
+
     function renderStep(index) {
         const step = steps[index];
         if (!step) return;
@@ -602,43 +686,184 @@ const Sound = (function () {
         if (stepEl) stepEl.textContent = `QUEST ${index + 1}/${steps.length}`;
         if (titleEl) titleEl.textContent = step.title;
         if (textEl) textEl.textContent = step.text;
-        if (npcLineEl) npcLineEl.textContent = `“${npcLines[activeNpc][index]}”`;
+        if (npcLineEl) npcLineEl.textContent = `“${npcLines[index]}”`;
         if (nextBtn) {
             const isLast = index === steps.length - 1;
-            nextBtn.textContent = isLast ? 'QUEST SELESAI! ✓' : 'LANJUTKAN QUEST ▸';
-            nextBtn.disabled = isLast;
+            nextBtn.textContent = isLast ? 'SELESAIKAN PETUALANGAN ★' : 'LANJUTKAN QUEST ▸';
+            nextBtn.disabled = false;
+        }
+        if (portraitEl) {
+            portraitEl.classList.remove('is-talking');
+            void portraitEl.offsetWidth;
+            portraitEl.classList.add('is-talking');
         }
         setWeather(step.weather);
+        updateBodyOffset();
+        saveProgress();
+
+        if (achievementMilestones[index] && !achievedMilestones.has(index)) {
+            achievedMilestones.add(index);
+            showAchievement(achievementMilestones[index]);
+        }
+    }
+
+    // "Lanjutkan Quest" doesn't just smooth-scroll -- it cuts to black with a
+    // title card, jumps the page to the next section while hidden, then
+    // clears, like a scene transition between levels instead of a scroll.
+    const transitionOverlay = document.getElementById('quest-transition');
+    const transitionStepEl = transitionOverlay ? transitionOverlay.querySelector('.js-transition-step') : null;
+    const transitionTitleEl = transitionOverlay ? transitionOverlay.querySelector('.js-transition-title') : null;
+    let transitioning = false;
+
+    // An instant jump across several sections (replay-to-top, checkpoint
+    // resume, the mid-transition cut) can make more than one section cross
+    // the IntersectionObserver's threshold in the same reflow -- the browser
+    // then reports all of them in one batch, in no particular order, which
+    // would let a stale entry stomp the renderStep() call this function
+    // already made. Muting the observer briefly makes the explicit call the
+    // only source of truth for that jump.
+    let suppressObserver = false;
+
+    function jumpTo(index, behavior) {
+        suppressObserver = true;
+        const target = document.getElementById(steps[index].id);
+        if (target) target.scrollIntoView({ behavior, block: 'start' });
+        renderStep(index);
+        window.setTimeout(() => {
+            suppressObserver = false;
+        }, 400);
     }
 
     function goNext() {
-        Sound.advance();
+        if (transitioning) return;
         const next = Math.min(current + 1, steps.length - 1);
-        const target = document.getElementById(steps[next].id);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (next === current) return;
+        transitioning = true;
+        Sound.advance();
+        if (nextBtn) nextBtn.disabled = true;
+
+        const step = steps[next];
+        if (transitionStepEl) transitionStepEl.textContent = `QUEST ${next + 1}/${steps.length}`;
+        if (transitionTitleEl) transitionTitleEl.textContent = step.title;
+
+        if (!transitionOverlay) {
+            jumpTo(next, 'smooth');
+            transitioning = false;
+            return;
+        }
+
+        transitionOverlay.classList.add('is-active');
+
+        window.setTimeout(() => {
+            jumpTo(next, 'instant');
+
+            window.setTimeout(() => {
+                transitionOverlay.classList.remove('is-active');
+                transitioning = false;
+            }, 650);
+        }, 260);
     }
 
     function exitAdventure() {
         Sound.exit();
         active = false;
+        transitioning = false;
         panel.hidden = true;
+        if (transitionOverlay) transitionOverlay.classList.remove('is-active');
         setWeather(null);
+        updateBodyOffset();
+        clearProgress();
     }
 
-    if (nextBtn) nextBtn.addEventListener('click', goNext);
+    // --- Ending screen: full victory recap once every quest is done --------
+    const endingOverlay = document.getElementById('adventure-ending');
+    const endingQuestsEl = endingOverlay ? endingOverlay.querySelector('.js-ending-quests') : null;
+    const endingXpEl = endingOverlay ? endingOverlay.querySelector('.js-ending-xp') : null;
+    const endingCompanionEl = endingOverlay ? endingOverlay.querySelector('.js-ending-companion') : null;
+    const endingReplayBtn = document.getElementById('adventure-ending-replay');
+    const endingCreativeBtn = document.getElementById('adventure-ending-creative');
+
+    function readTotalXp() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('portfolio_xp_state_v1') || 'null');
+            if (saved && typeof saved.xp === 'number') return saved.xp;
+        } catch (e) {
+            // ignore unavailable storage
+        }
+        return 0;
+    }
+
+    function finishAdventure() {
+        Sound.victory();
+        clearProgress();
+        if (endingQuestsEl) endingQuestsEl.textContent = `${steps.length}/${steps.length}`;
+        if (endingXpEl) endingXpEl.textContent = `${readTotalXp()} XP`;
+        if (endingCompanionEl) endingCompanionEl.textContent = petDisplayNames[currentPetChoice()] || '-';
+        if (endingOverlay) endingOverlay.hidden = false;
+    }
+
+    if (endingReplayBtn) {
+        endingReplayBtn.addEventListener('click', () => {
+            Sound.confirm();
+            if (endingOverlay) endingOverlay.hidden = true;
+            jumpTo(0, 'instant');
+        });
+    }
+
+    if (endingCreativeBtn) {
+        endingCreativeBtn.addEventListener('click', () => {
+            Sound.confirm();
+            if (endingOverlay) endingOverlay.hidden = true;
+            exitAdventure();
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (current === steps.length - 1) finishAdventure();
+            else goNext();
+        });
+    }
+
+    // --- Keyboard controls: arrow-right/Enter to advance, Esc to back out --
+    window.addEventListener('keydown', (e) => {
+        if (!active) return;
+        const tag = document.activeElement ? document.activeElement.tagName : '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+        if (e.key === 'ArrowRight' || e.key === 'Enter') {
+            e.preventDefault();
+            if (transitioning || (endingOverlay && !endingOverlay.hidden)) return;
+            if (current === steps.length - 1) finishAdventure();
+            else goNext();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            if (journalPanel && !journalPanel.hidden) closeJournal();
+            else if (!endingOverlay || endingOverlay.hidden) exitAdventure();
+        }
+    });
     if (exitBtn) exitBtn.addEventListener('click', exitAdventure);
 
     window.addEventListener('adventure:start', () => {
         active = true;
         panel.hidden = false;
-        setNpc(currentPetChoice());
-        renderStep(0);
+
+        // Checkpoint resume: the title-screen replay (see the bottom of this
+        // file) stashes the saved step here right before it clicks the
+        // "adventure" mode card, so this listener runs synchronously inside
+        // that click and can pick it straight up.
+        const resumeStep = window.__adventureResumeStep;
+        delete window.__adventureResumeStep;
+        const startIndex = typeof resumeStep === 'number' && resumeStep >= 0 && resumeStep < steps.length ? resumeStep : 0;
+
+        if (startIndex > 0) jumpTo(startIndex, 'instant');
+        else renderStep(0);
     });
 
     if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (!active) return;
+                if (!active || suppressObserver) return;
                 entries.forEach((entry) => {
                     if (!entry.isIntersecting) return;
                     const index = steps.findIndex((step) => step.id === entry.target.id);
@@ -652,6 +877,32 @@ const Sound = (function () {
             if (el) observer.observe(el);
         });
     }
+})();
+
+// Checkpoint resume: if a saved Adventure Mode session exists from a
+// previous visit, auto-replay the title-screen flow (gate -> character ->
+// mode) instead of leaving the visitor to start over from Quest 1. Runs
+// last so every click handler above is already wired up.
+(function () {
+    let saved = null;
+    try {
+        saved = JSON.parse(localStorage.getItem('portfolio_adventure_progress') || 'null');
+    } catch (e) {
+        saved = null;
+    }
+    if (!saved || !['knight', 'princess', 'dragon'].includes(saved.character) || typeof saved.step !== 'number') {
+        return;
+    }
+
+    const startBtn = document.getElementById('start-btn');
+    const card = document.querySelector(`.character-card[data-character="${saved.character}"]`);
+    const adventureCard = document.querySelector('.mode-card[data-mode="adventure"]');
+    if (!startBtn || !card || !adventureCard) return;
+
+    window.__adventureResumeStep = saved.step;
+    startBtn.click();
+    card.click();
+    adventureCard.click();
 })();
 
 // Guestbook comments: posted under the visitor's chosen mascot via fetch, so

@@ -7,7 +7,7 @@
             <button type="button" class="mode-card" data-mode="adventure">
                 <x-icon name="compass" class="h-12 w-12" />
                 <span class="mode-name font-display">ADVENTURE MODE</span>
-                <span class="mode-tagline font-body">Ikuti storyline quest satu per satu, lengkap dengan efek cuaca di tiap etape perjalanan.</span>
+                <span class="mode-tagline font-body">Ikuti storyline quest satu per satu, lengkap dengan cuaca di tiap perjalanan.</span>
             </button>
             <button type="button" class="mode-card" data-mode="creative">
                 <x-icon name="monitor" class="h-12 w-12" />

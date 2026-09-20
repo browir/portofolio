@@ -85,6 +85,26 @@
             <circle cx="23" cy="24" r="0.9" fill="#5c0018" />
             @break
 
+        @case('wira')
+            {{-- shirt / shoulders --}}
+            <path d="M13 32 15 23q1.4-3 5-3h10q3.6 0 5 3l2 9Z" fill="#29adff" />
+            <path d="M21 20h8l-1.4 5h-5.2Z" fill="#12365c" />
+            {{-- neck --}}
+            <rect x="22" y="16" width="6" height="5" fill="#e8b48c" />
+            {{-- head --}}
+            <circle cx="25" cy="11" r="8" fill="#f3c9a0" />
+            {{-- short hair --}}
+            <path d="M17 10.5q-.3-7.5 8-7.5t8 7.5q0 1.6-.6 2.6-.6-4-4-4.8-2 2.8-6.6 3.2-2.6.2-3.6 2.2-1-1.3-1.2-3.2Z" fill="#2b2016" />
+            {{-- headphones, a little dev signifier --}}
+            <path d="M17.5 12q-1-9 7.5-9t7.5 9" fill="none" stroke="#1d2b53" stroke-width="1.6" stroke-linecap="round" />
+            <rect x="15.3" y="10.5" width="3.6" height="6" rx="1.4" fill="#1d2b53" />
+            <rect x="31.1" y="10.5" width="3.6" height="6" rx="1.4" fill="#1d2b53" />
+            <rect x="15.9" y="11.3" width="2.4" height="4.4" rx="1" fill="#ffec27" />
+            <rect x="31.7" y="11.3" width="2.4" height="4.4" rx="1" fill="#ffec27" />
+            {{-- smile --}}
+            <path d="M22.6 16q2.4 1.5 4.8 0" stroke="#8a5a34" stroke-width="0.8" fill="none" stroke-linecap="round" />
+            @break
+
         @default
             <circle cx="16" cy="16" r="12" fill="#8b8bb8" />
     @endswitch

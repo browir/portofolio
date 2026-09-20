@@ -19,6 +19,8 @@
     @include('partials.character-select')
     @include('partials.mode-select')
     @include('partials.quest-guide')
+    @include('partials.quest-transition')
+    @include('partials.adventure-ending')
 
     <div id="scroll-progress" class="fixed top-0 left-0 h-[5px] w-0 z-[60] border-b-2 border-[#0b0b14]"></div>
 

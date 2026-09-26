@@ -945,33 +945,71 @@ body > * {
     opacity: 0.8;
 }
 
-/* Adventure Mode: quest-line panel docked at the bottom edge, RPG-textbox
-   style, instead of floating over the section the visitor is reading. The
-   page reserves matching space at its own bottom (see body padding-bottom
-   below) so this dock never covers content -- it sits in its own strip. */
+/* Adventure Mode: visual-novel style dialogue docked at the bottom edge --
+   Wira standing unframed on the screen's floor, speaking into a bubble that
+   carries both his line and the current quest objective. The page reserves
+   matching space at its own bottom (see body padding-bottom below) so this
+   dock never covers content -- it sits in its own strip. */
 .quest-guide {
     position: fixed;
     left: 50%;
     bottom: 0.85rem;
     transform: translateX(-50%);
     z-index: 56;
-    width: min(94vw, 30rem);
-    background: var(--color-panel-solid);
-    border: 3px solid var(--color-ink);
-    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
-    padding: 0.75rem 1rem 0.9rem;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    width: min(96vw, 44rem);
 }
 
 .quest-guide[hidden] {
     display: none;
 }
 
-/* Clear the bottom-left XP HUD on narrow screens, where the dock's width
-   would otherwise sit right on top of it. */
-@media (max-width: 36rem) {
-    .quest-guide {
-        bottom: 6rem;
-    }
+/* XP HUD is hidden during Adventure Mode (see the rule further down), so the
+   dock can keep the full bottom strip on narrow screens too. */
+.quest-npc-figure {
+    flex-shrink: 0;
+    width: 6.5rem;
+    filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.65));
+    animation: npc-idle-bob 2.6s ease-in-out infinite;
+}
+
+.quest-npc-figure.is-talking {
+    animation: npc-idle-bob 2.6s ease-in-out infinite, npc-talk-pop 0.45s steps(3);
+}
+
+.quest-npc-bubble {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    background: var(--color-panel-solid);
+    border: 3px solid var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+    padding: 0.7rem 1rem 0.85rem;
+}
+
+/* Tail aimed low on the bubble's left edge, at the character's head. */
+.quest-npc-bubble::before {
+    content: '';
+    position: absolute;
+    left: -1rem;
+    bottom: 1.6rem;
+    border: 0.5rem solid transparent;
+    border-right-color: var(--color-gold);
+}
+
+.quest-npc-name {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    color: var(--color-gold-bright);
+}
+
+.quest-npc-line {
+    margin-top: 0.35rem;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    color: var(--color-parchment);
 }
 
 .quest-guide-head {
@@ -1012,68 +1050,6 @@ body > * {
     opacity: 0.75;
 }
 
-/* NPC dialogue row: the chosen companion "speaks" the storyline at each
-   quest stop, RPG-textbox style -- portrait on the left, a speech bubble
-   with a pointer tail on the right. The portrait idles with a gentle bob so
-   it doesn't read as a frozen still image, and pulses when new dialogue
-   arrives to sell the "NPC is talking" moment. */
-.quest-guide-npc {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.6rem;
-    margin-top: 0.5rem;
-}
-
-.quest-guide-portrait {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    justify-content: center;
-    width: 2.4rem;
-    height: 2.4rem;
-    background: var(--color-ink);
-    border: 2px solid var(--color-gold);
-    animation: npc-idle-bob 2.6s ease-in-out infinite;
-    box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75);
-}
-
-.quest-guide-bubble {
-    position: relative;
-    flex: 1;
-    background: rgba(255, 236, 39, 0.08);
-    border: 2px solid var(--color-gold);
-    padding: 0.4rem 0.65rem 0.5rem;
-}
-
-.quest-guide-bubble::before {
-    content: '';
-    position: absolute;
-    left: -0.5rem;
-    top: 0.65rem;
-    border: 0.3rem solid transparent;
-    border-right-color: var(--color-gold);
-}
-
-.quest-guide-npc-name {
-    font-size: 0.55rem;
-    letter-spacing: 0.04em;
-    color: var(--color-gold-bright);
-}
-
-.quest-guide-npc-line {
-    margin-top: 0.2rem;
-    font-size: 0.95rem;
-    line-height: 1.3;
-    font-style: italic;
-    color: var(--color-parchment);
-}
-
-.quest-guide-step {
-    font-size: 0.6rem;
-    letter-spacing: 0.05em;
-    color: var(--color-gold-bright);
-}
-
 .quest-guide-exit {
     background: none;
     border: none;
@@ -1085,19 +1061,6 @@ body > * {
 
 .quest-guide-exit:hover {
     color: var(--color-crimson-bright);
-}
-
-.quest-guide-title {
-    margin-top: 0.45rem;
-    font-size: 0.75rem;
-    color: var(--color-parchment);
-}
-
-.quest-guide-text {
-    margin-top: 0.3rem;
-    font-size: 0.95rem;
-    line-height: 1.35;
-    color: var(--color-parchment-dim);
 }
 
 .quest-guide-next {
@@ -1123,6 +1086,35 @@ body > * {
     opacity: 0.6;
     cursor: default;
     transform: none;
+}
+
+@media (max-width: 36rem) {
+    .quest-guide {
+        gap: 0.5rem;
+    }
+
+    .quest-npc-figure {
+        width: 4rem;
+    }
+
+    .quest-npc-bubble {
+        padding: 0.6rem 0.7rem 0.7rem;
+    }
+
+    .quest-npc-bubble::before {
+        bottom: 1rem;
+    }
+}
+
+/* Adventure Mode hides the XP tracker entirely: the quest counter and the
+   achievement toasts already say where the visitor is, and two competing
+   progress meters at once just add noise. XP still accrues underneath, so
+   Creative Mode picks up where the adventure left off. */
+body.is-adventure #xp-hud,
+body.is-adventure #xp-progress-panel,
+body.is-adventure #xp-popup,
+body.is-adventure #level-up-toast {
+    display: none;
 }
 
 /* Adventure Mode: quest journal -- an on-demand overview of all 8 stops
@@ -1631,12 +1623,8 @@ body > * {
     50% { transform: translateY(-3px); }
 }
 
-@keyframes npc-talk-pulse {
-    0% { box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75), 0 0 0 0 rgba(255, 236, 39, 0.6); }
-    60% { box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75), 0 0 0 6px rgba(255, 236, 39, 0); }
-    100% { box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.75), 0 0 0 0 rgba(255, 236, 39, 0); }
-}
-
-.quest-guide-portrait.is-talking {
-    animation: npc-idle-bob 2.6s ease-in-out infinite, npc-talk-pulse 0.6s ease-out;
+@keyframes npc-talk-pop {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-4px) scale(1.06); }
+    100% { transform: translateY(0) scale(1); }
 }

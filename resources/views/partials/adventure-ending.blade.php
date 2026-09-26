@@ -9,10 +9,6 @@
                 <span class="adventure-ending-stat-value font-display js-ending-quests">8/8</span>
             </div>
             <div class="adventure-ending-stat">
-                <span class="adventure-ending-stat-label font-body">Total XP</span>
-                <span class="adventure-ending-stat-value font-display js-ending-xp">0 XP</span>
-            </div>
-            <div class="adventure-ending-stat">
                 <span class="adventure-ending-stat-label font-body">Ditemani</span>
                 <span class="adventure-ending-stat-value font-display js-ending-companion">KNIGHT</span>
             </div>

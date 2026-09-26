@@ -408,15 +408,17 @@ const Sound = (function () {
     const canvas = document.getElementById('weather-canvas');
     const ctx = canvas ? canvas.getContext('2d') : null;
 
+    // Titles feed the journal list and the between-stop transition card; the
+    // dialogue bubble itself only shows the NPC's spoken line.
     const steps = [
-        { id: 'top', title: 'Gerbang Portofolio', text: 'Perjalanan dimulai di sini, Player. Tarik napas -- dunia ini siap dijelajahi.', weather: 'sunny' },
-        { id: 'about', title: 'Kenali Sang Karakter', text: 'Sebelum lanjut, kenalan dulu sama pemilik dunia ini lewat lore-nya.', weather: 'autumn' },
-        { id: 'stats', title: 'Skill Tree', text: 'Lihat stat yang sudah di-level-up lewat bertahun-tahun latihan.', weather: 'sunny' },
-        { id: 'experience', title: 'Medan Pertempuran', text: 'Mission Log: quest-quest nyata yang pernah ditaklukkan di dunia kerja.', weather: 'rain' },
-        { id: 'achievements', title: 'Ruang Trofi', text: 'Bukti dari setiap quest yang berhasil diselesaikan sampai tuntas.', weather: 'snow' },
-        { id: 'education', title: 'Balai Guild', text: 'Tempat sang karakter dilatih, disertifikasi, dan naik rank.', weather: 'autumn' },
-        { id: 'contact', title: 'Portal Komunikasi', text: 'Mau merekrut karakter ini ke party-mu? Kirim pesan lewat portal ini.', weather: 'snow' },
-        { id: 'comments', title: 'Balai Warga', text: 'Quest terakhir: tinggalkan jejakmu di guestbook sebelum lanjut ke petualangan lain.', weather: 'rain' },
+        { id: 'top', title: 'Gerbang Portofolio', weather: 'sunny' },
+        { id: 'about', title: 'Kenali Sang Karakter', weather: 'autumn' },
+        { id: 'stats', title: 'Skill Tree', weather: 'sunny' },
+        { id: 'experience', title: 'Medan Pertempuran', weather: 'rain' },
+        { id: 'achievements', title: 'Ruang Trofi', weather: 'snow' },
+        { id: 'education', title: 'Balai Guild', weather: 'autumn' },
+        { id: 'contact', title: 'Portal Komunikasi', weather: 'snow' },
+        { id: 'comments', title: 'Balai Warga', weather: 'rain' },
     ];
 
     // The quest-giver NPC is the portfolio owner in first person -- a
@@ -434,11 +436,8 @@ const Sound = (function () {
         'Sebelum lanjut ke petualangan lain, boleh tinggalkan jejak di buku tamu ini? Aku bakal baca satu-satu.',
     ];
 
-    const stepEl = panel.querySelector('.js-quest-step');
-    const titleEl = panel.querySelector('.js-quest-title');
-    const textEl = panel.querySelector('.js-quest-text');
     const npcLineEl = panel.querySelector('.js-npc-line');
-    const portraitEl = panel.querySelector('.quest-guide-portrait');
+    const portraitEl = panel.querySelector('.quest-npc-figure');
     const nextBtn = document.getElementById('quest-guide-next');
     const exitBtn = document.getElementById('quest-guide-exit');
 
@@ -683,9 +682,6 @@ const Sound = (function () {
         const step = steps[index];
         if (!step) return;
         current = index;
-        if (stepEl) stepEl.textContent = `QUEST ${index + 1}/${steps.length}`;
-        if (titleEl) titleEl.textContent = step.title;
-        if (textEl) textEl.textContent = step.text;
         if (npcLineEl) npcLineEl.textContent = `“${npcLines[index]}”`;
         if (nextBtn) {
             const isLast = index === steps.length - 1;
@@ -769,6 +765,7 @@ const Sound = (function () {
         active = false;
         transitioning = false;
         panel.hidden = true;
+        document.body.classList.remove('is-adventure');
         if (transitionOverlay) transitionOverlay.classList.remove('is-active');
         setWeather(null);
         updateBodyOffset();
@@ -778,26 +775,14 @@ const Sound = (function () {
     // --- Ending screen: full victory recap once every quest is done --------
     const endingOverlay = document.getElementById('adventure-ending');
     const endingQuestsEl = endingOverlay ? endingOverlay.querySelector('.js-ending-quests') : null;
-    const endingXpEl = endingOverlay ? endingOverlay.querySelector('.js-ending-xp') : null;
     const endingCompanionEl = endingOverlay ? endingOverlay.querySelector('.js-ending-companion') : null;
     const endingReplayBtn = document.getElementById('adventure-ending-replay');
     const endingCreativeBtn = document.getElementById('adventure-ending-creative');
-
-    function readTotalXp() {
-        try {
-            const saved = JSON.parse(localStorage.getItem('portfolio_xp_state_v1') || 'null');
-            if (saved && typeof saved.xp === 'number') return saved.xp;
-        } catch (e) {
-            // ignore unavailable storage
-        }
-        return 0;
-    }
 
     function finishAdventure() {
         Sound.victory();
         clearProgress();
         if (endingQuestsEl) endingQuestsEl.textContent = `${steps.length}/${steps.length}`;
-        if (endingXpEl) endingXpEl.textContent = `${readTotalXp()} XP`;
         if (endingCompanionEl) endingCompanionEl.textContent = petDisplayNames[currentPetChoice()] || '-';
         if (endingOverlay) endingOverlay.hidden = false;
     }
@@ -847,6 +832,7 @@ const Sound = (function () {
     window.addEventListener('adventure:start', () => {
         active = true;
         panel.hidden = false;
+        document.body.classList.add('is-adventure');
 
         // Checkpoint resume: the title-screen replay (see the bottom of this
         // file) stashes the saved step here right before it clicks the

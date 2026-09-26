@@ -281,14 +281,275 @@ body > * {
     transition: box-shadow 0.15s ease;
 }
 
-/* Square portrait frame for the hero avatar -- concentric pixel border
-   instead of a soft glowing ring. */
-.avatar-ring {
-    border-radius: 0 !important;
-    box-shadow:
-        0 0 0 3px var(--color-ink),
-        0 0 0 6px var(--color-gold),
-        6px 6px 0 0 rgba(0, 0, 0, 0.7);
+/* ---------------------------------------------------------------------------
+   Hero: a JRPG title/status screen rather than a landing-page masthead.
+   Everything here is hard-edged on purpose -- no blurred glows, no gradient
+   avatars, no floating cards -- so the first screen matches the pixel
+   language the rest of the page already speaks.
+   --------------------------------------------------------------------------- */
+.hero-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Pixel starfield: hard colour stops, so each star is a crisp dot. */
+.hero-stars {
+    position: absolute;
+    inset: 0;
+    opacity: 0.55;
+    background-image:
+        radial-gradient(circle, var(--color-gold-bright) 0 1.5px, transparent 1.6px),
+        radial-gradient(circle, var(--color-arcane) 0 1.5px, transparent 1.6px),
+        radial-gradient(circle, var(--color-emerald-bright) 0 1.5px, transparent 1.6px);
+    background-size: 137px 121px, 211px 173px, 313px 247px;
+    background-position: 23px 17px, 97px 61px, 169px 113px;
+    animation: hero-twinkle 3.2s steps(2) infinite;
+}
+
+/* Wireframe floor plane, fading upward -- the ground the sprite stands on. */
+.hero-floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 9rem;
+    background-image:
+        repeating-linear-gradient(90deg, rgba(0, 228, 54, 0.22) 0 1px, transparent 1px 16px),
+        repeating-linear-gradient(0deg, rgba(0, 228, 54, 0.22) 0 1px, transparent 1px 16px);
+    -webkit-mask-image: linear-gradient(0deg, #000, transparent);
+    mask-image: linear-gradient(0deg, #000, transparent);
+}
+
+@keyframes hero-twinkle {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 0.3; }
+}
+
+.hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.55rem;
+    line-height: 1.6;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-emerald-bright);
+}
+
+.hero-status::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    flex-shrink: 0;
+    background: var(--color-emerald);
+    box-shadow: 0 0 0 2px var(--color-ink);
+    animation: hero-blink 1.1s steps(2) infinite;
+}
+
+@keyframes hero-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.15; }
+}
+
+.hero-name {
+    margin-top: 1.1rem;
+    font-size: clamp(1.35rem, 5vw, 2.6rem);
+    line-height: 1.5;
+    color: var(--color-gold-bright);
+    text-shadow: 4px 4px 0 var(--color-ink), 8px 8px 0 rgba(0, 0, 0, 0.35);
+}
+
+.hero-class {
+    margin-top: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-parchment-dim);
+}
+
+.hero-lv {
+    padding: 0.25rem 0.45rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.04em;
+    color: var(--color-ink);
+    background: var(--color-gold);
+    box-shadow: 3px 3px 0 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Tagline typed into the screen: a blinking block caret parks at the end of
+   the line the way an RPG textbox waits for input. */
+.hero-bio {
+    margin-top: 1.5rem;
+    max-width: 34rem;
+    padding-left: 0.9rem;
+    border-left: 3px solid var(--color-gold);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--color-parchment);
+}
+
+.hero-caret {
+    display: inline-block;
+    width: 0.55rem;
+    height: 1.05rem;
+    margin-left: 0.35rem;
+    vertical-align: -0.15rem;
+    background: var(--color-gold);
+    animation: hero-blink 1s steps(2) infinite;
+}
+
+/* Title-screen menu: a cursor-driven list instead of a row of CTA buttons. */
+.hero-menu {
+    margin-top: 2rem;
+    max-width: 26rem;
+    border-top: 1px dashed rgba(255, 236, 39, 0.2);
+}
+
+.hero-menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0.5rem 0.7rem 1.6rem;
+    border-bottom: 1px dashed rgba(255, 236, 39, 0.2);
+    font-size: 0.65rem;
+    letter-spacing: 0.03em;
+    color: var(--color-parchment);
+    transition: background-color 0.1s steps(2), color 0.1s steps(2);
+}
+
+.hero-menu-item::before {
+    content: '\25B8';
+    position: absolute;
+    left: 0.3rem;
+    color: var(--color-gold-bright);
+    opacity: 0;
+    transform: translateX(-0.3rem);
+    transition: opacity 0.1s steps(2), transform 0.1s steps(2);
+}
+
+.hero-menu-item:hover,
+.hero-menu-item:focus-visible {
+    background: rgba(255, 236, 39, 0.08);
+    color: var(--color-gold-bright);
+    outline: none;
+}
+
+.hero-menu-item:hover::before,
+.hero-menu-item:focus-visible::before {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.hero-menu-hint {
+    flex-shrink: 0;
+    font-size: 1rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--color-parchment-dim);
+}
+
+/* Status window: labelled like a menu panel, with the tab biting into the
+   top border the way a fieldset legend does. */
+.hero-window-tab {
+    position: absolute;
+    top: -0.65rem;
+    left: 1.25rem;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    color: var(--color-gold-bright);
+    background: var(--color-ink);
+    border: 2px solid var(--color-gold);
+}
+
+.hero-portrait {
+    display: block;
+    flex-shrink: 0;
+    width: 6rem;
+    padding: 0.35rem 0.35rem 0;
+    background: var(--color-ink);
+    box-shadow: 0 0 0 3px var(--color-gold), 5px 5px 0 0 rgba(0, 0, 0, 0.7);
+    animation: npc-idle-bob 3s ease-in-out infinite;
+}
+
+.hero-portrait-name {
+    display: block;
+    font-size: 1.25rem;
+    line-height: 1.35;
+    color: var(--color-gold-bright);
+}
+
+.hero-portrait-class {
+    display: block;
+    margin-top: 0.35rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.08em;
+    color: var(--color-parchment-dim);
+}
+
+/* Parameter rows with dotted leaders, like a stat sheet. */
+.hero-params {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hero-param {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+}
+
+.hero-param-label {
+    flex-shrink: 0;
+    color: var(--color-parchment-dim);
+}
+
+.hero-param-dots {
+    flex: 1;
+    min-width: 1.5rem;
+    height: 3px;
+    transform: translateY(-0.3rem);
+    background-image: repeating-linear-gradient(90deg, rgba(255, 236, 39, 0.4) 0 3px, transparent 3px 7px);
+}
+
+.hero-param-value {
+    flex-shrink: 1;
+    text-align: right;
+    color: var(--color-parchment);
+}
+
+.hero-slots-label {
+    margin-top: 1.5rem;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    color: var(--color-gold-bright);
+}
+
+.hero-slots {
+    margin-top: 0.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.hero-slot {
+    padding: 0.2rem 0.5rem;
+    font-size: 1rem;
+    color: var(--color-parchment);
+    background: rgba(255, 236, 39, 0.07);
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 0 2px rgba(255, 236, 39, 0.5);
 }
 
 /* Career timeline */

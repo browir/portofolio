@@ -242,12 +242,29 @@ const Sound = (function () {
     const STORAGE_KEY = 'portfolio_pet_choice';
 
     const characters = {
-        knight: { quotes: ['Siap bertarung!', 'Zero bug adalah misi utama.', 'Untuk kejayaan proyek ini!'] },
-        princess: { quotes: ['Untuk kejayaan kerajaan kode ini!', 'Anggun di UI, tegas di logic.', 'Setiap baris adalah mahkota kemenangan.'] },
-        dragon: { quotes: ['Grrr... lapar commit baru!', 'Deploy atau mati!', 'Aku jaga server ini.'] },
+        knight: {
+            name: 'KNIGHT',
+            intro: 'Pedang terangkat! Selama aku di sisimu, tak ada bug yang lewat, Player.',
+            quotes: ['Siap bertarung!', 'Zero bug adalah misi utama.', 'Untuk kejayaan proyek ini!'],
+        },
+        princess: {
+            name: 'PRINCESS',
+            intro: 'Kereta sudah siap. Jalan santai saja — strateginya sudah kususun rapi.',
+            quotes: ['Untuk kejayaan kerajaan kode ini!', 'Anggun di UI, tegas di logic.', 'Setiap baris adalah mahkota kemenangan.'],
+        },
+        dragon: {
+            name: 'DRAGON',
+            intro: 'GRAAAH! Tunjuk saja error-nya, biar kubakar sampai habis.',
+            quotes: ['Grrr... lapar commit baru!', 'Deploy atau mati!', 'Aku jaga server ini.'],
+        },
     };
 
+    const confirmBox = document.getElementById('character-confirm');
+    const confirmBtn = document.getElementById('character-confirm-btn');
+    const quoteEl = select.querySelector('.js-character-quote');
+
     let currentChoice = null;
+    let auditioning = null;
     let bubbleTimer = null;
     let bubbleHideTimer = null;
     let wandering = false;
@@ -363,9 +380,37 @@ const Sound = (function () {
         }
     }
 
+    // Audition: the card's sprite breaks into its signature animation and the
+    // character introduces itself. Nothing is committed until the confirm
+    // button below the grid is pressed.
+    function audition(id) {
+        if (!characters[id]) return;
+        auditioning = id;
+        Sound.blip();
+
+        select.querySelectorAll('.character-card').forEach((card) => {
+            card.classList.toggle('is-auditioning', card.dataset.character === id);
+        });
+
+        if (quoteEl) {
+            quoteEl.textContent = `“${characters[id].intro}”`;
+            quoteEl.classList.remove('is-active');
+            void quoteEl.offsetWidth;
+            quoteEl.classList.add('is-active');
+        }
+        if (confirmBtn) confirmBtn.textContent = `PILIH ${characters[id].name} ▸`;
+        if (confirmBox) confirmBox.hidden = false;
+    }
+
     select.querySelectorAll('.character-card').forEach((card) => {
-        card.addEventListener('click', () => choose(card.dataset.character));
+        card.addEventListener('click', () => audition(card.dataset.character));
     });
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            if (auditioning) choose(auditioning);
+        });
+    }
 
     if (petAvatar) {
         petAvatar.addEventListener('click', (e) => {
@@ -882,12 +927,14 @@ const Sound = (function () {
 
     const startBtn = document.getElementById('start-btn');
     const card = document.querySelector(`.character-card[data-character="${saved.character}"]`);
+    const confirmBtn = document.getElementById('character-confirm-btn');
     const adventureCard = document.querySelector('.mode-card[data-mode="adventure"]');
-    if (!startBtn || !card || !adventureCard) return;
+    if (!startBtn || !card || !confirmBtn || !adventureCard) return;
 
     window.__adventureResumeStep = saved.step;
     startBtn.click();
     card.click();
+    confirmBtn.click();
     adventureCard.click();
 })();
 

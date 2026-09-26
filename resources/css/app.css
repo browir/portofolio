@@ -953,6 +953,9 @@ body > * {
 .character-select-inner {
     position: relative;
     z-index: 1;
+    /* auto margins rather than the parent's align-items, so a tall stack
+       (grid + audition strip) can still scroll to its own top edge. */
+    margin: auto;
     width: 100%;
     max-width: 48rem;
     text-align: center;
@@ -1026,6 +1029,109 @@ body > * {
 
 .character-card.is-picked {
     box-shadow: 0 0 0 3px var(--color-emerald-bright), 6px 6px 0 0 rgba(0, 0, 0, 0.75);
+}
+
+/* Audition state: the clicked card steps forward and its sprite performs --
+   every moving part speeds up and the whole sprite hops -- so the pick feels
+   answered before the visitor commits to it. */
+.character-card[data-character].is-auditioning {
+    transform: translate(-4px, -4px);
+    box-shadow: 0 0 0 4px var(--color-gold-bright), 11px 11px 0 0 rgba(0, 0, 0, 0.8);
+}
+
+/* The sprite zooms in by growing its own box (not a transform), so the card
+   actually makes room for it instead of the art spilling over its neighbours.
+   On top of that each character performs its own move. */
+.character-sprite {
+    transition: width 0.2s steps(4), height 0.2s steps(4);
+}
+
+.character-card.is-auditioning .character-sprite {
+    width: 7rem;
+    height: 7rem;
+}
+
+.character-card[data-character="knight"].is-auditioning .character-sprite {
+    animation: knight-charge 0.5s ease-in-out infinite;
+}
+
+.character-card[data-character="princess"].is-auditioning .character-sprite {
+    animation: princess-parade 1.4s ease-in-out infinite;
+}
+
+.character-card[data-character="dragon"].is-auditioning .character-sprite {
+    animation: dragon-fly 1.1s ease-in-out infinite;
+}
+
+/* Knight charges on the spot: rocks forward into the swing, then back. */
+@keyframes knight-charge {
+    0%, 100% { transform: translate(-3px, 0); }
+    50% { transform: translate(3px, -4px); }
+}
+
+/* Princess parades past: a slow glide with the carriage's own bounce on top. */
+@keyframes princess-parade {
+    0%, 100% { transform: translate(-5px, 0); }
+    50% { transform: translate(5px, -2px); }
+}
+
+/* Dragon takes off: lifts, banks, and swells as it roars. */
+@keyframes dragon-fly {
+    0%, 100% { transform: translateY(0) rotate(-2deg) scale(1); }
+    30% { transform: translateY(-11px) rotate(2deg) scale(1.08); }
+    65% { transform: translateY(-5px) rotate(-1deg) scale(1.02); }
+}
+
+.character-card.is-auditioning .mount-leg,
+.character-card.is-auditioning .carriage-wheel,
+.character-card.is-auditioning .carriage-body,
+.character-card.is-auditioning .princess-spear,
+.character-card.is-auditioning .character-wing {
+    animation-duration: 0.3s;
+}
+
+.character-card.is-auditioning .knight-sword,
+.character-card.is-auditioning .knight-glint,
+.character-card.is-auditioning .mount-tail {
+    animation-duration: 0.5s;
+}
+
+.character-card.is-auditioning .dragon-flame,
+.character-card.is-auditioning .crown-sparkle {
+    animation-duration: 0.9s;
+}
+
+/* Audition strip: the character's own line, then the commit button. */
+.character-confirm {
+    margin-top: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.character-confirm[hidden] {
+    display: none;
+}
+
+.character-quote {
+    max-width: 32rem;
+    padding: 0.7rem 1rem;
+    font-size: 1.2rem;
+    line-height: 1.45;
+    color: var(--color-parchment);
+    background: var(--color-panel-solid);
+    border: 2px solid var(--color-gold);
+    box-shadow: 4px 4px 0 0 rgba(0, 0, 0, 0.7);
+}
+
+.character-quote.is-active {
+    animation: comment-pop 0.25s steps(4);
+}
+
+.character-confirm-btn {
+    padding: 0.8rem 1.6rem;
+    font-size: 0.7rem;
 }
 
 .character-name {
@@ -1867,6 +1973,75 @@ body.is-adventure #level-up-toast {
     50% { transform: translateY(0) rotate(0deg); }
 }
 
+/* Knight's horse: tail swishes, head nods, so the mount isn't just a body
+   with moving legs bolted on. */
+.mount-tail {
+    transform-box: fill-box;
+    transform-origin: top left;
+    animation: tail-swish 1.1s ease-in-out infinite;
+}
+
+@keyframes tail-swish {
+    0%, 100% { transform: rotate(-7deg); }
+    50% { transform: rotate(9deg); }
+}
+
+.mount-head {
+    transform-box: fill-box;
+    transform-origin: bottom left;
+    animation: head-nod 1.6s ease-in-out infinite;
+}
+
+@keyframes head-nod {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+/* Knight himself: helmet plume waves, sword swings, blade catches the light,
+   visor slits glow on and off like a lit HUD. */
+.knight-plume {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: plume-wave 0.9s ease-in-out infinite;
+}
+
+@keyframes plume-wave {
+    0%, 100% { transform: rotate(-9deg); }
+    50% { transform: rotate(11deg); }
+}
+
+.knight-sword {
+    transform-box: fill-box;
+    transform-origin: bottom left;
+    animation: sword-swing 1.8s ease-in-out infinite;
+}
+
+@keyframes sword-swing {
+    0%, 100% { transform: rotate(0deg); }
+    45% { transform: rotate(-13deg); }
+}
+
+.knight-glint {
+    opacity: 0;
+    animation: blade-glint 2.4s steps(2) infinite;
+}
+
+@keyframes blade-glint {
+    0%, 70%, 100% { opacity: 0; }
+    76% { opacity: 0.9; }
+    82% { opacity: 0.2; }
+    88% { opacity: 0.7; }
+}
+
+.knight-eye {
+    animation: visor-glow 1.4s steps(2) infinite;
+}
+
+@keyframes visor-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
 /* Princess's carriage wheels: spin continuously, spokes make the rotation
    actually readable instead of a plain circle sitting still. */
 .carriage-wheel {
@@ -1877,6 +2052,119 @@ body.is-adventure #level-up-toast {
 
 @keyframes wheel-spin {
     to { transform: rotate(360deg); }
+}
+
+/* The cabin (and the princess riding in it) jostles over the wheels, while
+   the escort's spear bobs with his stride and the crown throws a sparkle. */
+.carriage-body {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: carriage-bounce 0.5s ease-in-out infinite;
+}
+
+@keyframes carriage-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-0.9px); }
+}
+
+.princess-spear {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: spear-bob 0.5s ease-in-out infinite;
+}
+
+@keyframes spear-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-1.2px) rotate(-3deg); }
+}
+
+.crown-sparkle {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    animation: sparkle-pop 2.8s steps(3) infinite;
+}
+
+@keyframes sparkle-pop {
+    0%, 62%, 100% { opacity: 0; transform: scale(0.3); }
+    70% { opacity: 1; transform: scale(1); }
+    80% { opacity: 0.6; transform: scale(0.7); }
+}
+
+/* Dragon: horns twitch, and every couple of seconds it breathes fire. */
+.dragon-horn {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: horn-twitch 2.2s steps(2) infinite;
+}
+
+@keyframes horn-twitch {
+    0%, 85%, 100% { transform: rotate(0deg); }
+    90% { transform: rotate(-5deg); }
+}
+
+.dragon-flame {
+    transform-box: fill-box;
+    transform-origin: top center;
+    opacity: 0;
+    animation: flame-breath 2.6s steps(3) infinite;
+}
+
+@keyframes flame-breath {
+    0%, 58%, 100% { opacity: 0; transform: scaleY(0.2); }
+    66% { opacity: 1; transform: scaleY(1.05); }
+    76% { opacity: 0.85; transform: scaleY(0.75); }
+    86% { opacity: 1; transform: scaleY(1); }
+}
+
+/* Eyes that blink: held closed for a couple of frames, pixel-style. */
+.blink-eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: eye-blink 3.4s steps(1) infinite;
+}
+
+@keyframes eye-blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    96% { transform: scaleY(0.1); }
+}
+
+.wira-led {
+    animation: led-pulse 1.6s steps(2) infinite;
+}
+
+.wira-led-b {
+    animation-delay: 0.8s;
+}
+
+@keyframes led-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+/* Talking head: while the quest guide is delivering a line, the closed smile
+   and the open mouth trade places a few times so Wira reads as speaking
+   rather than holding a pose. */
+.wira-mouth-talk {
+    opacity: 0;
+}
+
+.is-talking .wira-mouth-talk {
+    animation: wira-yap 0.16s 5;
+}
+
+.is-talking .wira-mouth-idle {
+    animation: wira-yap-off 0.16s 5;
+}
+
+@keyframes wira-yap {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@keyframes wira-yap-off {
+    0%, 50% { opacity: 0; }
+    51%, 100% { opacity: 1; }
 }
 
 @keyframes npc-idle-bob {

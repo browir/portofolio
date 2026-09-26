@@ -20,6 +20,16 @@
                 <span class="character-tagline font-body">Garang &amp; tak kenal takut</span>
             </button>
         </div>
+
+        {{-- Confirm step: picking a card only auditions the character (its
+             sprite springs to life and it says its line); the visitor has to
+             press the button to actually take it along. --}}
+        <div class="character-confirm" id="character-confirm" hidden>
+            <p class="character-quote font-body js-character-quote" aria-live="polite"></p>
+            <button type="button" class="btn-quest btn-primary character-confirm-btn font-display" id="character-confirm-btn">
+                PILIH KARAKTER &#9656;
+            </button>
+        </div>
     </div>
 </div>
 
